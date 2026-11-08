@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reserve Rental Item | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link" href="search.html">Search</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-5">
+    <div class="container">
+      <div id="bookingLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2">Initializing rental booking engine...</p>
+      </div>
+
+      <div id="bookingContent" class="row g-4 justify-content-center d-none">
+        <div class="col-lg-7">
+          <div class="custom-card p-4 p-md-5 bg-white">
+            <h4 class="fw-bold mb-1">Step 1: Select Rental Schedule</h4>
+            <p class="text-muted small mb-4">Choose your start and return dates. Durations of 5+ days unlock automatic tier discounts.</p>
+
+            <form id="bookingForm" onsubmit="handleBookingSubmit(event)">
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Rental Start Date *</label>
+                  <input type="date" class="form-control" id="bookStartDate" required onchange="calculateRentalLive()">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Rental Return Date *</label>
+                  <input type="date" class="form-control" id="bookEndDate" required onchange="calculateRentalLive()">
+                </div>
+              </div>
+
+              <!-- Live Availability Status Banner -->
+              <div id="availabilityBanner" class="alert alert-secondary py-2 px-3 small mb-4 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-question"></i>
+                <span id="availabilityText">Select dates to check real-time availability.</span>
+              </div>
+
+              <!-- Customer Details Snapshot -->
+              <h5 class="fw-bold mb-3 pt-3 border-top">Step 2: Customer Verification</h5>
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Renter Name</label>
+                  <input type="text" class="form-control" id="bookCustomerName" readonly disabled>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Email</label>
+                  <input type="email" class="form-control" id="bookCustomerEmail" readonly disabled>
+                </div>
+              </div>
+
+              <div id="bookingErrorAlert" class="alert alert-danger d-none py-2 small mb-3"></div>
+
+              <button type="submit" id="btnSubmitBooking" class="btn btn-primary-custom w-100 py-3 fw-semibold fs-5" disabled>
+                <span id="btnSubmitText"><i class="fa-solid fa-lock me-2"></i>Confirm Reservation</span>
+                <span id="btnSubmitSpinner" class="spinner-border spinner-border-sm d-none"></span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Summary Column -->
+        <div class="col-lg-5">
+          <div class="custom-card p-4 bg-white sticky-top" style="top: 90px;">
+            <h5 class="fw-bold mb-3 border-bottom pb-2">Booking Cost Summary</h5>
+
+            <div class="d-flex gap-3 mb-3">
+              <img id="summaryItemImg" src="" alt="Thumbnail" class="rounded-3 shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+              <div>
+                <span id="summaryCategoryBadge" class="badge bg-primary mb-1">Car</span>
+                <h6 class="fw-bold mb-0 text-dark" id="summaryItemTitle">Loading...</h6>
+                <span class="text-muted small" id="summaryDailyRate">₹0 / day</span>
+              </div>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 mb-3 small">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Rental Duration:</span>
+                <strong id="summaryDays">0 days</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Base Rent:</span>
+                <span id="summaryBaseRent">₹0.00</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2 text-success" id="summaryDiscountRow" style="display: none;">
+                <span id="summaryDiscountLabel">Duration Discount:</span>
+                <span id="summaryDiscountVal">-₹0.00</span>
+              </div>
+              <div class="d-flex justify-content-between pt-2 border-top">
+                <span class="text-muted">Refundable Security Deposit:</span>
+                <strong id="summaryDeposit">₹0.00</strong>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-baseline p-3 bg-primary bg-opacity-10 rounded-3 mb-3 border border-primary border-opacity-25">
+              <div>
+                <span class="fw-bold text-navy">Total Payable</span>
+                <div class="small text-muted">(Rent + Refundable Deposit)</div>
+              </div>
+              <span class="fs-3 fw-bold text-primary" id="summaryTotalAmount">₹0.00</span>
+            </div>
+
+            <p class="text-muted small mb-0">
+              <i class="fa-solid fa-circle-info text-info me-1"></i>Security deposit is held safely during your rental and refunded immediately upon check-in inspection.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer-custom">
+    <div class="container text-center small text-muted">
+      &copy; 2026 Smart Rental Management System. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let currentItem = null;
+
+    async function initBookingPage() {
+      const user = API.getUser();
+      if (!user || !API.getToken()) {
+        showToast('Please sign in to place a rental reservation.', 'info');
+        setTimeout(() => {
+          window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+        }, 600);
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const itemId = params.get('id');
+      if (!itemId) {
+        window.location.href = 'categories.html';
+        return;
+      }
+
+      try {
+        const res = await API.get(`/items/${itemId}`);
+        currentItem = res.item;
+        if (!currentItem) throw new Error('Item not found');
+
+        document.getElementById('bookingLoading').classList.add('d-none');
+        document.getElementById('bookingContent').classList.remove('d-none');
+
+        // Customer details
+        document.getElementById('bookCustomerName').value = user.full_name || 'Renter';
+        document.getElementById('bookCustomerEmail').value = user.email;
+
+        // Item details snapshot
+        document.getElementById('summaryItemImg').src = currentItem.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800';
+        document.getElementById('summaryItemTitle').textContent = currentItem.title;
+        document.getElementById('summaryDailyRate').textContent = `${formatCurrency(currentItem.daily_rate)} / day`;
+        document.getElementById('summaryCategoryBadge').textContent = currentItem.category;
+        document.getElementById('summaryCategoryBadge').className = `badge badge-${currentItem.category}`;
+        document.getElementById('summaryDeposit').textContent = formatCurrency(currentItem.security_deposit);
+
+        // Set default dates: tomorrow to +4 days
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 5);
+
+        document.getElementById('bookStartDate').min = tomorrow.toISOString().split('T')[0];
+        document.getElementById('bookStartDate').value = tomorrow.toISOString().split('T')[0];
+        document.getElementById('bookEndDate').min = tomorrow.toISOString().split('T')[0];
+        document.getElementById('bookEndDate').value = endDate.toISOString().split('T')[0];
+
+        calculateRentalLive();
+      } catch (err) {
+        document.getElementById('bookingLoading').innerHTML = `
+          <div class="alert alert-danger">${err.message}</div>
+        `;
+      }
+    }
+
+    async function calculateRentalLive() {
+      if (!currentItem) return;
+
+      const start = document.getElementById('bookStartDate').value;
+      const end = document.getElementById('bookEndDate').value;
+      const banner = document.getElementById('availabilityBanner');
+      const bannerText = document.getElementById('availabilityText');
+      const submitBtn = document.getElementById('btnSubmitBooking');
+      const discountRow = document.getElementById('summaryDiscountRow');
+
+      if (!start || !end) return;
+
+      const d1 = new Date(start);
+      const d2 = new Date(end);
+      const diffTime = d2.getTime() - d1.getTime();
+      const days = Math.round(diffTime / (1000 * 3600 * 24));
+
+      if (days < 1) {
+        banner.className = 'alert alert-danger py-2 px-3 small mb-4 d-flex align-items-center gap-2';
+        bannerText.textContent = 'Return date must be at least 1 day after start date.';
+        submitBtn.disabled = true;
+        return;
+      }
+
+      // Check live availability via backend API
+      try {
+        const avail = await API.get('/availability', {
+          item_id: currentItem.id,
+          start_date: start,
+          end_date: end
+        });
+
+        if (avail.available) {
+          banner.className = 'alert alert-success py-2 px-3 small mb-4 d-flex align-items-center gap-2';
+          bannerText.innerHTML = '<i class="fa-solid fa-circle-check"></i> Item is AVAILABLE for these selected dates!';
+          submitBtn.disabled = false;
+        } else {
+          banner.className = 'alert alert-warning py-2 px-3 small mb-4 d-flex align-items-center gap-2';
+          bannerText.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Item is already reserved during these dates. Please choose alternate dates.';
+          submitBtn.disabled = true;
+        }
+      } catch {
+        banner.className = 'alert alert-secondary py-2 px-3 small mb-4 d-flex align-items-center gap-2';
+        bannerText.textContent = 'Checking availability...';
+      }
+
+      // Financial Calculation
+      const baseRent = days * currentItem.daily_rate;
+      let discountPct = 0;
+      if (days >= 30) discountPct = 20;
+      else if (days >= 14) discountPct = 15;
+      else if (days >= 7) discountPct = 10;
+      else if (days >= 5) discountPct = 5;
+
+      const discountAmount = baseRent * (discountPct / 100);
+      const deposit = Number(currentItem.security_deposit) || 0;
+      const totalAmount = (baseRent - discountAmount) + deposit;
+
+      document.getElementById('summaryDays').textContent = `${days} day${days > 1 ? 's' : ''}`;
+      document.getElementById('summaryBaseRent').textContent = formatCurrency(baseRent);
+
+      if (discountPct > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('summaryDiscountLabel').textContent = `Duration Discount (${discountPct}%):`;
+        document.getElementById('summaryDiscountVal').textContent = `-${formatCurrency(discountAmount)}`;
+      } else {
+        discountRow.style.display = 'none';
+      }
+
+      document.getElementById('summaryTotalAmount').textContent = formatCurrency(totalAmount);
+    }
+
+    async function handleBookingSubmit(e) {
+      e.preventDefault();
+      const start = document.getElementById('bookStartDate').value;
+      const end = document.getElementById('bookEndDate').value;
+      const errorBox = document.getElementById('bookingErrorAlert');
+      const submitBtn = document.getElementById('btnSubmitBooking');
+      const btnText = document.getElementById('btnSubmitText');
+      const spinner = document.getElementById('btnSubmitSpinner');
+
+      errorBox.classList.add('d-none');
+      submitBtn.disabled = true;
+      btnText.classList.add('d-none');
+      spinner.classList.remove('d-none');
+
+      try {
+        const payload = {
+          item_id: currentItem.id,
+          start_date: start,
+          end_date: end
+        };
+
+        const res = await API.post('/bookings', payload);
+        if (res.success && res.booking) {
+          showToast('Booking successfully placed!', 'success');
+          setTimeout(() => {
+            window.location.href = `booking-confirmation.html?code=${res.booking.booking_code}`;
+          }, 600);
+        } else {
+          throw new Error(res.error || 'Failed to place booking.');
+        }
+      } catch (err) {
+        errorBox.textContent = err.message || 'Error creating booking.';
+        errorBox.classList.remove('d-none');
+        submitBtn.disabled = false;
+        btnText.classList.remove('d-none');
+        spinner.classList.add('d-none');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initBookingPage);
+  </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Record Demo Payment | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <main class="py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="custom-card p-4 p-md-5 bg-white shadow-lg">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+              <div>
+                <h3 class="fw-bold mb-0">Record Demo Payment</h3>
+                <p class="text-muted small mb-0">Simulated Academic Payment Gateway</p>
+              </div>
+              <span class="badge bg-warning text-dark px-3 py-2">Demo Mode (Non-Financial)</span>
+            </div>
+
+            <!-- Booking Bill Snapshot -->
+            <div class="bg-light p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center">
+              <div>
+                <div class="small text-muted">Booking Reference:</div>
+                <strong class="font-monospace text-primary fs-5" id="payBookingCode">Loading...</strong>
+                <div class="small text-muted" id="payItemTitle">Loading item...</div>
+              </div>
+              <div class="text-end">
+                <div class="small text-muted">Amount Due:</div>
+                <strong class="fs-3 text-dark" id="payTotalAmount">₹0.00</strong>
+              </div>
+            </div>
+
+            <!-- Demo Simulation Notice -->
+            <div class="alert alert-warning py-2 px-3 small mb-4 d-flex align-items-center gap-2">
+              <i class="fa-solid fa-flask-vial fs-5 text-warning"></i>
+              <div>
+                <strong>Simulation Only:</strong> This is an academic demonstration payment environment. Transactions are simulated and recorded locally for test orders.
+              </div>
+            </div>
+
+            <!-- Payment Methods Tabs -->
+            <ul class="nav nav-pills nav-fill mb-4" id="payTab" role="tablist">
+              <li class="nav-item">
+                <button class="nav-link active fw-semibold" id="upi-tab" data-bs-toggle="pill" data-bs-target="#tabUpi">
+                  <i class="fa-solid fa-qrcode me-2"></i>UPI Demo
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link fw-semibold" id="card-tab" data-bs-toggle="pill" data-bs-target="#tabCard">
+                  <i class="fa-solid fa-credit-card me-2"></i>Card Demo
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link fw-semibold" id="cash-tab" data-bs-toggle="pill" data-bs-target="#tabCash">
+                  <i class="fa-solid fa-money-bill-wave me-2"></i>Cash at Hub
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content mb-4" id="payTabContent">
+              <!-- Tab 1: UPI Demo -->
+              <div class="tab-pane fade show active" id="tabUpi">
+                <div class="text-center p-3 border rounded-3 bg-light mb-3">
+                  <div class="p-3 bg-white d-inline-block rounded-3 shadow-sm mb-3">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=demo@smartrental&pn=SmartRental&mc=0000"
+                         alt="UPI Demo QR Code" style="width: 160px; height: 160px;">
+                  </div>
+                  <h6 class="fw-bold mb-1">Scan Demo UPI QR Code</h6>
+                  <p class="small text-muted mb-2">Google Pay / PhonePe / Paytm / BHIM Simulation</p>
+                  <div class="small font-monospace bg-white py-1 px-3 d-inline-block rounded border">
+                    UPI ID: <strong>demo.srms@upi</strong>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Simulated VPA / Phone Number</label>
+                  <input type="text" class="form-control" id="upiInput" value="customer@okhdfcbank" placeholder="name@upi">
+                </div>
+              </div>
+
+              <!-- Tab 2: Card Demo -->
+              <div class="tab-pane fade" id="tabCard">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">Cardholder Name</label>
+                    <input type="text" class="form-control" id="cardNameInput" value="Aarav Sharma" placeholder="Name on card">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">Card Number (Demo)</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fa-solid fa-credit-card"></i></span>
+                      <input type="text" class="form-control font-monospace" id="cardNumberInput" value="4111 2222 3333 4444" placeholder="XXXX XXXX XXXX XXXX">
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small fw-semibold">Expiry</label>
+                    <input type="text" class="form-control" value="12/28" placeholder="MM/YY">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small fw-semibold">CVV</label>
+                    <input type="password" class="form-control font-monospace" value="123" maxlength="3">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 3: Cash -->
+              <div class="tab-pane fade" id="tabCash">
+                <div class="p-4 border rounded-3 bg-light text-center">
+                  <div class="stat-icon stat-icon-amber mx-auto mb-3"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                  <h5 class="fw-bold mb-1">Cash Payment at Delivery / Hub Counter</h5>
+                  <p class="text-muted small mb-0">Record this transaction as confirmed cash receipt received by our rental fleet agent.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="btn btn-accent btn-lg w-100 py-3 fw-semibold" id="btnConfirmPay" onclick="processPayment()">
+              <span id="btnPayText"><i class="fa-solid fa-shield-check me-2"></i>Authorize Demo Payment (<span id="btnPayAmt">₹0</span>)</span>
+              <span id="btnPaySpinner" class="spinner-border spinner-border-sm d-none"></span>
+            </button>
+
+            <!-- Academic Disclaimer -->
+            <p class="text-muted text-center small mt-3 mb-0">
+              <i class="fa-solid fa-info-circle me-1"></i>Academic local project demonstration. No real bank accounts, cards or UPI transactions are debited.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer-custom">
+    <div class="container text-center small text-muted">
+      &copy; 2026 Smart Rental Management System. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let activeBooking = null;
+
+    async function initPayment() {
+      const params = new URLSearchParams(window.location.search);
+      const bookingId = params.get('booking_id');
+      if (!bookingId) {
+        window.location.href = 'customer-dashboard.html';
+        return;
+      }
+
+      try {
+        const res = await API.get(`/bookings/${bookingId}`);
+        activeBooking = res.booking;
+        if (!activeBooking) throw new Error('Booking not found');
+
+        document.getElementById('payBookingCode').textContent = activeBooking.booking_code;
+        document.getElementById('payItemTitle').textContent = activeBooking.item_title || 'Item #' + activeBooking.item_id;
+        document.getElementById('payTotalAmount').textContent = formatCurrency(activeBooking.total_amount);
+        document.getElementById('btnPayAmt').textContent = formatCurrency(activeBooking.total_amount);
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function processPayment() {
+      if (!activeBooking) return;
+
+      const activeTab = document.querySelector('#payTab .active').id;
+      let method = 'UPI Demo';
+      if (activeTab === 'card-tab') method = 'Card Demo';
+      else if (activeTab === 'cash-tab') method = 'Cash';
+
+      const btn = document.getElementById('btnConfirmPay');
+      const btnText = document.getElementById('btnPayText');
+      const spinner = document.getElementById('btnPaySpinner');
+
+      btn.disabled = true;
+      btnText.classList.add('d-none');
+      spinner.classList.remove('d-none');
+
+      try {
+        const payload = {
+          booking_id: activeBooking.id,
+          amount: activeBooking.total_amount,
+          payment_method: method,
+          payment_type: 'Rental Payment',
+          remarks: `Demo payment authorized via ${method}`
+        };
+
+        const res = await API.post('/payments', payload);
+        if (res.success && res.payment) {
+          showToast(`Demo payment confirmed! Txn: ${res.payment.transaction_id}`, 'success');
+          setTimeout(() => {
+            window.location.href = `billing.html?booking_id=${activeBooking.id}`;
+          }, 800);
+        } else {
+          throw new Error(res.error || 'Payment failed');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled = false;
+        btnText.classList.remove('d-none');
+        spinner.classList.add('d-none');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initPayment);
+  </script>
+</body>
+</html>

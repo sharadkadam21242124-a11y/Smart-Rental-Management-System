@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Payments | Admin Console</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);"><i class="fa-solid fa-shield-halved"></i></div>
+        <span>Smart Rental <small class="fw-normal text-info fs-6">| Admin Console</small></span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar" style="background-color: #0d1b2a;">
+      <div class="sidebar-title">Administration</div>
+      <a href="admin-dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+      <a href="manage-items.html" class="sidebar-link"><i class="fa-solid fa-boxes-stacked"></i>Manage Items</a>
+      <a href="manage-customers.html" class="sidebar-link"><i class="fa-solid fa-users"></i>Manage Customers</a>
+      <a href="manage-bookings.html" class="sidebar-link"><i class="fa-solid fa-list-check"></i>Manage Bookings</a>
+      <a href="manage-payments.html" class="sidebar-link active"><i class="fa-solid fa-money-check-dollar"></i>Manage Payments</a>
+      <a href="return-management.html" class="sidebar-link"><i class="fa-solid fa-arrow-rotate-left"></i>Return Check-in</a>
+      <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-chart-line"></i>Reports & Analytics</a>
+      <a href="admin-profile.html" class="sidebar-link"><i class="fa-solid fa-user-gear"></i>Admin Profile</a>
+
+      <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="sidebar-link text-danger">
+          <i class="fa-solid fa-right-from-bracket"></i>Logout
+        </a>
+      </div>
+    </aside>
+
+    <main class="dashboard-content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Financial Transactions & Receipts</h2>
+          <p class="text-muted small mb-0">Audit demo transactions, deposits, refunds, and late fees</p>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="custom-card p-3 mb-4 bg-white">
+        <div class="row g-2">
+          <div class="col-md-5">
+            <input type="text" class="form-control form-control-sm" id="paySearch" placeholder="Search by Txn ID, customer, or booking code..." onkeyup="filterPayments()">
+          </div>
+          <div class="col-md-4">
+            <select class="form-select form-select-sm" id="payMethodFilter" onchange="filterPayments()">
+              <option value="">All Payment Methods</option>
+              <option value="UPI Demo">UPI Demo</option>
+              <option value="Card Demo">Card Demo</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-outline-secondary btn-sm w-100" onclick="loadAllPayments()">Refresh Transactions</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="custom-card p-4 bg-white shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small">
+              <tr>
+                <th>Txn Reference</th>
+                <th>Customer</th>
+                <th>Booking Code</th>
+                <th>Method</th>
+                <th>Type</th>
+                <th>Amount (INR)</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="allPaymentsTbody">
+              <tr><td colspan="9" class="text-center py-4 text-muted">Loading payments...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let allPaymentsList = [];
+
+    async function loadAllPayments() {
+      try {
+        const res = await API.get('/payments');
+        allPaymentsList = res.payments || [];
+        renderPayments(allPaymentsList);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function renderPayments(items) {
+      const tbody = document.getElementById('allPaymentsTbody');
+      if (items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">No transactions found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = items.map(p => `
+        <tr>
+          <td><strong class="font-monospace text-dark">${p.transaction_id}</strong></td>
+          <td><strong class="text-dark">${p.customer_name || 'Customer #' + p.customer_id}</strong></td>
+          <td><span class="font-monospace text-primary">${p.booking_code || '-'}</span></td>
+          <td><span class="badge bg-light text-dark border">${p.payment_method}</span></td>
+          <td><span class="badge ${p.payment_type === 'Deposit Refund' ? 'bg-info text-dark' : 'bg-primary'}">${p.payment_type}</span></td>
+          <td><strong class="${p.payment_type === 'Deposit Refund' ? 'text-success' : 'text-dark'}">${formatCurrency(p.amount)}</strong></td>
+          <td><span class="badge ${p.payment_status === 'refunded' ? 'bg-info text-dark' : 'bg-success'} text-capitalize">${p.payment_status}</span></td>
+          <td class="small text-muted">${formatDate(p.payment_date)}</td>
+          <td class="small text-muted">${p.remarks || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function filterPayments() {
+      const q = document.getElementById('paySearch').value.toLowerCase();
+      const method = document.getElementById('payMethodFilter').value;
+
+      const filtered = allPaymentsList.filter(p => {
+        const mQ = !q || p.transaction_id.toLowerCase().includes(q) || (p.customer_name && p.customer_name.toLowerCase().includes(q)) || (p.booking_code && p.booking_code.toLowerCase().includes(q));
+        const mMethod = !method || p.payment_method === method;
+        return mQ && mMethod;
+      });
+      renderPayments(filtered);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAllPayments);
+  </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a href="categories.html" class="btn btn-outline-light btn-sm d-none d-md-inline-block">
+          <i class="fa-solid fa-compass me-1"></i>Rent Items
+        </a>
+        <ul class="navbar-nav align-items-center" id="navbarAuthLinks"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-title">Customer Portal</div>
+      <a href="customer-dashboard.html" class="sidebar-link active"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+      <a href="my-bookings.html" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i>My Bookings</a>
+      <a href="rental-history.html" class="sidebar-link"><i class="fa-solid fa-clock-rotate-left"></i>Rental History</a>
+      <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user"></i>My Profile</a>
+
+      <div class="sidebar-title mt-4">Browse Catalog</div>
+      <a href="cars.html" class="sidebar-link"><i class="fa-solid fa-car"></i>Cars</a>
+      <a href="bikes.html" class="sidebar-link"><i class="fa-solid fa-motorcycle"></i>Bikes</a>
+      <a href="houses.html" class="sidebar-link"><i class="fa-solid fa-house"></i>Houses</a>
+      <a href="furniture.html" class="sidebar-link"><i class="fa-solid fa-couch"></i>Furniture</a>
+      <a href="search.html" class="sidebar-link"><i class="fa-solid fa-magnifying-glass"></i>Search All</a>
+
+      <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="sidebar-link text-danger">
+          <i class="fa-solid fa-right-from-bracket"></i>Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1" id="dashWelcome">Welcome, Customer!</h2>
+          <p class="text-muted small mb-0">Overview of your active rentals, reservations, and payment settlements.</p>
+        </div>
+        <div class="mt-2 mt-md-0">
+          <a href="categories.html" class="btn btn-primary-custom"><i class="fa-solid fa-plus me-1"></i>New Rental Booking</a>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-calendar-check"></i></div>
+            <div>
+              <div class="stat-val" id="statTotalBookings">0</div>
+              <div class="stat-label">Total Bookings</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-emerald"><i class="fa-solid fa-key"></i></div>
+            <div>
+              <div class="stat-val" id="statActiveRentals">0</div>
+              <div class="stat-label">Active Rentals</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-credit-card"></i></div>
+            <div>
+              <div class="stat-val" id="statTotalSpent">₹0</div>
+              <div class="stat-label">Total Amount Paid</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-rose"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div>
+              <div class="stat-val" id="statCompletedRentals">0</div>
+              <div class="stat-label">Returned & Closed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Grid -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <a href="cars.html" class="custom-card p-3 d-flex align-items-center gap-3 text-decoration-none">
+            <div class="brand-icon"><i class="fa-solid fa-car"></i></div>
+            <div>
+              <h6 class="fw-bold text-dark mb-0">Rent a Car</h6>
+              <span class="text-muted small">Explore vehicle fleet</span>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="bikes.html" class="custom-card p-3 d-flex align-items-center gap-3 text-decoration-none">
+            <div class="brand-icon" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-motorcycle"></i></div>
+            <div>
+              <h6 class="fw-bold text-dark mb-0">Rent a Bike</h6>
+              <span class="text-muted small">Sports & cruisers</span>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="houses.html" class="custom-card p-3 d-flex align-items-center gap-3 text-decoration-none">
+            <div class="brand-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><i class="fa-solid fa-house"></i></div>
+            <div>
+              <h6 class="fw-bold text-dark mb-0">Lease a House</h6>
+              <span class="text-muted small">Apartments & villas</span>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3">
+          <a href="furniture.html" class="custom-card p-3 d-flex align-items-center gap-3 text-decoration-none">
+            <div class="brand-icon" style="background: linear-gradient(135deg, #a855f7, #7e22ce);"><i class="fa-solid fa-couch"></i></div>
+            <div>
+              <h6 class="fw-bold text-dark mb-0">Rent Furniture</h6>
+              <span class="text-muted small">Living & office sets</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Recent Bookings Table -->
+      <div class="custom-card p-4 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Your Recent Bookings</h5>
+          <a href="my-bookings.html" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small">
+              <tr>
+                <th>Booking Code</th>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Rental Dates</th>
+                <th>Days</th>
+                <th>Total (INR)</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="dashBookingsTbody">
+              <tr>
+                <td colspan="8" class="text-center py-4 text-muted">
+                  <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading your bookings...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    async function initDashboard() {
+      const user = API.getUser();
+      if (!user || !API.getToken()) {
+        window.location.href = 'login.html';
+        return;
+      }
+      if (user.role === 'admin') {
+        window.location.href = 'admin-dashboard.html';
+        return;
+      }
+
+      document.getElementById('dashWelcome').textContent = `Welcome back, ${user.full_name || 'Customer'}!`;
+
+      try {
+        const data = await API.get('/bookings');
+        const bookings = data.bookings || [];
+
+        document.getElementById('statTotalBookings').textContent = bookings.length;
+        const active = bookings.filter(b => b.booking_status === 'active' || b.booking_status === 'confirmed').length;
+        document.getElementById('statActiveRentals').textContent = active;
+        const completed = bookings.filter(b => b.booking_status === 'completed').length;
+        document.getElementById('statCompletedRentals').textContent = completed;
+
+        const totalSpent = bookings.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+        document.getElementById('statTotalSpent').textContent = formatCurrency(totalSpent);
+
+        const tbody = document.getElementById('dashBookingsTbody');
+        if (bookings.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center py-5">
+                <i class="fa-solid fa-box-open text-muted fs-3 mb-2 d-block"></i>
+                <p class="text-muted small mb-2">You don't have any rental bookings yet.</p>
+                <a href="categories.html" class="btn btn-primary-custom btn-sm">Browse Items & Rent Now</a>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const recent = bookings.slice(0, 5);
+        tbody.innerHTML = recent.map(b => `
+          <tr>
+            <td><strong class="font-monospace text-primary">${b.booking_code}</strong></td>
+            <td>
+              <div class="fw-semibold">${b.item_title || 'Item #' + b.item_id}</div>
+            </td>
+            <td><span class="badge badge-category position-static badge-${b.category || 'Car'}">${b.category || 'General'}</span></td>
+            <td class="small text-muted">${formatDate(b.start_date)} to ${formatDate(b.end_date)}</td>
+            <td>${b.rental_days} d</td>
+            <td><strong>${formatCurrency(b.total_amount)}</strong></td>
+            <td>
+              <span class="badge ${getStatusBadge(b.booking_status)} text-capitalize">${b.booking_status}</span>
+            </td>
+            <td>
+              <a href="booking-confirmation.html?code=${b.booking_code}" class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-receipt me-1"></i>View
+              </a>
+            </td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'active': return 'bg-primary';
+        case 'confirmed': return 'bg-info text-dark';
+        case 'completed': return 'bg-success';
+        case 'cancelled': return 'bg-danger';
+        default: return 'bg-warning text-dark';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>

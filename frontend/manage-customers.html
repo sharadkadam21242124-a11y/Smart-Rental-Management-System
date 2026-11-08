@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Customers | Admin Console</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);"><i class="fa-solid fa-shield-halved"></i></div>
+        <span>Smart Rental <small class="fw-normal text-info fs-6">| Admin Console</small></span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar" style="background-color: #0d1b2a;">
+      <div class="sidebar-title">Administration</div>
+      <a href="admin-dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+      <a href="manage-items.html" class="sidebar-link"><i class="fa-solid fa-boxes-stacked"></i>Manage Items</a>
+      <a href="manage-customers.html" class="sidebar-link active"><i class="fa-solid fa-users"></i>Manage Customers</a>
+      <a href="manage-bookings.html" class="sidebar-link"><i class="fa-solid fa-list-check"></i>Manage Bookings</a>
+      <a href="manage-payments.html" class="sidebar-link"><i class="fa-solid fa-money-check-dollar"></i>Manage Payments</a>
+      <a href="return-management.html" class="sidebar-link"><i class="fa-solid fa-arrow-rotate-left"></i>Return Check-in</a>
+      <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-chart-line"></i>Reports & Analytics</a>
+      <a href="admin-profile.html" class="sidebar-link"><i class="fa-solid fa-user-gear"></i>Admin Profile</a>
+
+      <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="sidebar-link text-danger">
+          <i class="fa-solid fa-right-from-bracket"></i>Logout
+        </a>
+      </div>
+    </aside>
+
+    <main class="dashboard-content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Customer Accounts Management</h2>
+          <p class="text-muted small mb-0">View registered renters, inspect ID verifications, and toggle account activation</p>
+        </div>
+      </div>
+
+      <!-- Search bar -->
+      <div class="custom-card p-3 mb-4 bg-white">
+        <div class="row g-2">
+          <div class="col-md-6">
+            <input type="text" class="form-control form-control-sm" id="customerSearch" placeholder="Search by name, email, or phone number..." onkeyup="filterCustomers()">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" id="custStatusFilter" onchange="filterCustomers()">
+              <option value="">All Account Statuses</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Suspended Only</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-outline-secondary btn-sm w-100" onclick="loadCustomers()">Refresh List</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customers Table -->
+      <div class="custom-card p-4 bg-white shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small">
+              <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>National ID (Aadhaar)</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="customersTbody">
+              <tr><td colspan="8" class="text-center py-4 text-muted">Loading customers from MySQL...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let customersList = [];
+
+    async function loadCustomers() {
+      try {
+        const res = await API.get('/admin/customers');
+        customersList = res.customers || [];
+        renderCustomers(customersList);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function renderCustomers(items) {
+      const tbody = document.getElementById('customersTbody');
+      if (items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No customers found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = items.map(c => `
+        <tr>
+          <td><span class="font-monospace text-muted">#${c.customer_id}</span></td>
+          <td><strong class="text-dark">${c.full_name}</strong></td>
+          <td><a href="mailto:${c.email}" class="text-decoration-none">${c.email}</a></td>
+          <td>${c.phone}</td>
+          <td class="small text-muted" style="max-width: 220px;">${c.address}</td>
+          <td class="small font-monospace">${c.id_proof_number || '-'}</td>
+          <td>
+            <span class="badge ${c.is_active ? 'bg-success' : 'bg-danger'}">${c.is_active ? 'Active' : 'Suspended'}</span>
+          </td>
+          <td>
+            <button class="btn btn-sm ${c.is_active ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="toggleCustomerStatus(${c.user_id}, ${c.is_active ? 0 : 1})">
+              ${c.is_active ? '<i class="fa-solid fa-ban me-1"></i>Disable' : '<i class="fa-solid fa-check me-1"></i>Enable'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterCustomers() {
+      const q = document.getElementById('customerSearch').value.toLowerCase();
+      const status = document.getElementById('custStatusFilter').value;
+
+      const filtered = customersList.filter(c => {
+        const mQ = !q || c.full_name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q);
+        const mStatus = !status || (status === 'active' && c.is_active) || (status === 'inactive' && !c.is_active);
+        return mQ && mStatus;
+      });
+      renderCustomers(filtered);
+    }
+
+    async function toggleCustomerStatus(userId, newActiveStatus) {
+      try {
+        await API.put(`/admin/customers/${userId}/status`, { is_active: newActiveStatus });
+        showToast(`Customer account status updated!`, 'success');
+        loadCustomers();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCustomers);
+  </script>
+</body>
+</html>

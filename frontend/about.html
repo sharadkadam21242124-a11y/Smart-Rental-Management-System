@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="bikes.html">Bikes</a></li>
+          <li class="nav-item"><a class="nav-link" href="houses.html">Houses</a></li>
+          <li class="nav-item"><a class="nav-link" href="furniture.html">Furniture</a></li>
+          <li class="nav-item"><a class="nav-link" href="search.html"><i class="fa-solid fa-magnifying-glass me-1"></i>Search</a></li>
+          <li class="nav-item"><a class="nav-link active" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header Banner -->
+  <header class="py-5 bg-dark text-white text-center" style="background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));">
+    <div class="container">
+      <h1 class="fw-bold mb-2">About Smart Rental Management System</h1>
+      <p class="text-info fs-5 mb-0">Second-Year Computer Engineering Capstone Project</p>
+    </div>
+  </header>
+
+  <main class="py-5">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-8">
+          <div class="custom-card p-4 p-md-5 bg-white mb-4">
+            <h3 class="fw-bold text-navy mb-3">Project Overview</h3>
+            <p class="text-muted leading-relaxed">
+              The <strong>Smart Rental Management System (SRMS)</strong> is a real-world, full-stack multi-category rental platform created to bridge theoretical <strong>Object-Oriented Programming (OOP)</strong> concepts with enterprise software architecture.
+            </p>
+            <p class="text-muted leading-relaxed">
+              Instead of a toy console application, this project delivers a production-style decoupled web architecture: a high-performance <strong>C++17</strong> REST API backend running on an embedded multi-threaded HTTP server (<code>cpp-httplib</code>), backed permanently by <strong>MySQL 8.0 Community Server</strong> with InnoDB storage engine, and a modern frontend built with <strong>HTML5, CSS3, JavaScript ES6, and Bootstrap 5</strong>.
+            </p>
+
+            <h4 class="fw-bold mt-4 mb-3">Core Pillars of Engineering</h4>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="p-3 border rounded-3 bg-light h-100">
+                  <h6 class="fw-bold text-primary"><i class="fa-solid fa-cubes me-2"></i>29 OOP Concepts Grounded</h6>
+                  <p class="small text-muted mb-0">From fundamental encapsulation to abstract factories, templates, operator overloading, and RAII resource guards.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 border rounded-3 bg-light h-100">
+                  <h6 class="fw-bold text-success"><i class="fa-solid fa-database me-2"></i>MySQL 8.0 Workbench Integration</h6>
+                  <p class="small text-muted mb-0">Full InnoDB relational schema with 13 tables, foreign keys, cascade triggers, and dedicated least-privileged user access.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 border rounded-3 bg-light h-100">
+                  <h6 class="fw-bold text-warning"><i class="fa-solid fa-calculator me-2"></i>Polymorphic Business Logic</h6>
+                  <p class="small text-muted mb-0">Dynamic duration discounting, insurance calculations, check-in late fees, and audited security deposit refunds.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 border rounded-3 bg-light h-100">
+                  <h6 class="fw-bold text-info"><i class="fa-solid fa-layer-group me-2"></i>4 Comprehensive Categories</h6>
+                  <p class="small text-muted mb-0">Realistic Indian rental domain models for Automobiles, Two-Wheelers, Real Estate, and Home/Office Furniture.</p>
+                </div>
+              </div>
+            </div>
+
+            <h4 class="fw-bold mt-5 mb-3">Our Mission & Academic Vision</h4>
+            <p class="text-muted leading-relaxed mb-0">
+              To demonstrate that low-level systems programming in C++ can power modern web applications with unparalleled efficiency, rigorous memory safety, and strict compile-time type validation, providing students and evaluators with a blueprint for modern full-stack systems design.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="custom-card p-4 bg-white mb-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-graduation-cap me-2 text-primary"></i>Academic Details</h5>
+            <ul class="list-unstyled small mb-0">
+              <li class="mb-2"><strong>Academic Degree:</strong> Bachelor of Technology (B.Tech)</li>
+              <li class="mb-2"><strong>Discipline:</strong> Computer Engineering</li>
+              <li class="mb-2"><strong>Academic Year:</strong> Second Year (SE)</li>
+              <li class="mb-2"><strong>Course:</strong> Advanced Object-Oriented Programming & Database Systems</li>
+              <li class="mb-2"><strong>Backend Compiler:</strong> GCC / MSVC (C++17)</li>
+              <li class="mb-2"><strong>Database Engine:</strong> MySQL 8.0 Community</li>
+            </ul>
+          </div>
+
+          <div class="custom-card p-4 bg-white">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-pdf me-2 text-danger"></i>Project Documentation</h5>
+            <p class="small text-muted mb-3">Comprehensive documentation files included inside the project:</p>
+            <ul class="list-unstyled small">
+              <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><code>OOP_CONCEPTS.md</code></li>
+              <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><code>DATABASE_DESIGN.md</code></li>
+              <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><code>API_DOCUMENTATION.md</code></li>
+              <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><code>README.md</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-custom">
+    <div class="container text-center small text-muted">
+      &copy; 2026 Smart Rental Management System. Academic Capstone Project.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+</body>
+</html>

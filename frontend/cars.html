@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Rentals | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link active" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="bikes.html">Bikes</a></li>
+          <li class="nav-item"><a class="nav-link" href="houses.html">Houses</a></li>
+          <li class="nav-item"><a class="nav-link" href="furniture.html">Furniture</a></li>
+          <li class="nav-item"><a class="nav-link" href="search.html"><i class="fa-solid fa-magnifying-glass me-1"></i>Search</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <div class="py-4 bg-white border-bottom">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <h2 class="fw-bold mb-1"><i class="fa-solid fa-car text-primary me-2"></i>Car Rental Fleet</h2>
+        <p class="text-muted small mb-0">Hatchbacks, compact SUVs, executive sedans, and luxury 4x4 off-roaders across India</p>
+      </div>
+      <div class="mt-2 mt-md-0">
+        <span class="badge bg-primary fs-6 px-3 py-2" id="carsCountBadge">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="py-4">
+    <div class="container">
+      <!-- Search & Filters Bar -->
+      <div class="custom-card p-3 mb-4 bg-white">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-4">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fa-solid fa-search text-muted"></i></span>
+              <input type="text" class="form-control" id="carSearchInput" placeholder="Search by brand or model (e.g. Harrier, Thar)..." onkeyup="filterCars()">
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <select class="form-select" id="carFuelFilter" onchange="filterCars()">
+              <option value="">All Fuel Types</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Electric">Electric (EV)</option>
+            </select>
+          </div>
+          <div class="col-md-3 col-6">
+            <select class="form-select" id="carSortFilter" onchange="filterCars()">
+              <option value="">Sort by Default</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-outline-secondary w-100" onclick="resetFilters()"><i class="fa-solid fa-rotate-left me-1"></i>Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fleet Grid -->
+      <div class="row g-4" id="carsGrid">
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-2">Loading car fleet from C++ backend...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer-custom">
+    <div class="container text-center small text-muted">
+      &copy; 2026 Smart Rental Management System. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let allCars = [];
+
+    async function loadCars() {
+      try {
+        const data = await API.get('/items', { category: 'Car' });
+        allCars = data.items || [];
+        renderCars(allCars);
+      } catch (err) {
+        document.getElementById('carsGrid').innerHTML = `
+          <div class="col-12 alert alert-danger text-center">Failed to load cars. Make sure C++ backend is running.</div>
+        `;
+      }
+    }
+
+    function renderCars(items) {
+      document.getElementById('carsCountBadge').textContent = `${items.length} Available`;
+      const grid = document.getElementById('carsGrid');
+
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div class="col-12 empty-state">
+            <i class="fa-solid fa-car-side empty-state-icon"></i>
+            <h5>No cars match your criteria</h5>
+            <p class="text-muted">Try adjusting your filters or search keywords.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = items.map(c => `
+        <div class="col-lg-4 col-md-6">
+          <div class="custom-card position-relative h-100 d-flex flex-column">
+            <span class="badge-category badge-Car">Car</span>
+            <img src="${c.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800'}" alt="${c.title}" class="card-item-img">
+            <div class="p-4 d-flex flex-column flex-grow-1">
+              <h5 class="fw-bold mb-1 text-dark">${c.title}</h5>
+              <div class="d-flex flex-wrap gap-2 my-2 small">
+                <span class="badge bg-light text-dark border"><i class="fa-solid fa-gas-pump me-1 text-primary"></i>${c.fuel_type || 'Petrol'}</span>
+                <span class="badge bg-light text-dark border"><i class="fa-solid fa-gears me-1 text-secondary"></i>${c.transmission || 'Manual'}</span>
+                <span class="badge bg-light text-dark border"><i class="fa-solid fa-users me-1 text-success"></i>${c.seating_capacity || 5} Seats</span>
+                <span class="badge bg-light text-dark border"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${c.location}</span>
+              </div>
+              <p class="text-muted small mb-3 flex-grow-1">${c.description.substring(0, 90)}...</p>
+              <div class="d-flex justify-content-between align-items-center mb-3 pt-2 border-top">
+                <div>
+                  <span class="price-tag">${formatCurrency(c.daily_rate)}</span>
+                  <span class="price-sub">/day</span>
+                  <div class="small text-muted">Deposit: ${formatCurrency(c.security_deposit)}</div>
+                </div>
+                <span class="badge ${c.status === 'available' ? 'bg-success' : 'bg-warning text-dark'} text-capitalize">${c.status}</span>
+              </div>
+              <div class="d-flex gap-2">
+                <a href="item-details.html?id=${c.id}" class="btn btn-outline-secondary w-50 btn-sm fw-semibold">Specs & Details</a>
+                <a href="booking.html?id=${c.id}" class="btn btn-primary-custom w-50 btn-sm fw-semibold ${c.status !== 'available' ? 'disabled' : ''}">Rent Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCars() {
+      const q = document.getElementById('carSearchInput').value.toLowerCase();
+      const fuel = document.getElementById('carFuelFilter').value;
+      const sort = document.getElementById('carSortFilter').value;
+
+      let filtered = allCars.filter(c => {
+        const matchesQ = !q || c.title.toLowerCase().includes(q) || (c.brand && c.brand.toLowerCase().includes(q)) || (c.model && c.model.toLowerCase().includes(q));
+        const matchesFuel = !fuel || (c.fuel_type && c.fuel_type.toLowerCase() === fuel.toLowerCase());
+        return matchesQ && matchesFuel;
+      });
+
+      if (sort === 'price_asc') {
+        filtered.sort((a, b) => a.daily_rate - b.daily_rate);
+      } else if (sort === 'price_desc') {
+        filtered.sort((a, b) => b.daily_rate - a.daily_rate);
+      }
+
+      renderCars(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('carSearchInput').value = '';
+      document.getElementById('carFuelFilter').value = '';
+      document.getElementById('carSortFilter').value = '';
+      renderCars(allCars);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCars);
+  </script>
+</body>
+</html>

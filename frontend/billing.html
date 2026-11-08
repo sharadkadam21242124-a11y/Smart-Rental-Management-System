@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rental Billing & Invoice | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printableInvoice, #printableInvoice * { visibility: visible; }
+      #printableInvoice { position: absolute; left: 0; top: 0; width: 100%; border: none !important; box-shadow: none !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top no-print">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <main class="py-5">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <a href="customer-dashboard.html" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to Dashboard</a>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary btn-sm" onclick="window.print()"><i class="fa-solid fa-print me-1"></i>Print Invoice</button>
+          <a id="btnPayFromBill" href="#" class="btn btn-accent btn-sm fw-semibold"><i class="fa-solid fa-credit-card me-1"></i>Pay Now</a>
+        </div>
+      </div>
+
+      <!-- Printable Invoice Card -->
+      <div class="custom-card p-4 p-md-5 bg-white shadow-lg mx-auto" style="max-width: 850px;" id="printableInvoice">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="brand-icon" style="width: 32px; height: 32px; font-size: 1rem;"><i class="fa-solid fa-key"></i></div>
+              <h4 class="fw-bold mb-0 text-dark">Smart Rental Management System</h4>
+            </div>
+            <p class="text-muted small mb-0">Multi-Category Rental Platform & Equipment Services</p>
+            <p class="text-muted small mb-0">GSTIN: 29AAAAA0000A1Z5 | Support: support@smartrental.com</p>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-primary fs-6 mb-2" id="invPaymentStatus">UNPAID</span>
+            <div class="small text-muted">Invoice No:</div>
+            <strong class="font-monospace text-dark fs-6" id="invNumber">INV-2026-XXXX</strong>
+            <div class="small text-muted mt-1">Issue Date: <span id="invDate">-</span></div>
+          </div>
+        </div>
+
+        <!-- Bill To & Booking Info -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6">
+            <h6 class="fw-bold text-muted small text-uppercase">Billed To:</h6>
+            <h5 class="fw-bold mb-1" id="invCustomerName">Customer Name</h5>
+            <div class="text-muted small" id="invCustomerEmail">Email</div>
+          </div>
+          <div class="col-sm-6 text-sm-end">
+            <h6 class="fw-bold text-muted small text-uppercase">Booking Reference:</h6>
+            <strong class="font-monospace text-primary fs-6 d-block" id="invBookingCode">BK-2026-XXXX</strong>
+            <div class="text-muted small">Rental Schedule: <span id="invSchedule">-</span></div>
+            <div class="text-muted small">Duration: <strong id="invDays">0 days</strong></div>
+          </div>
+        </div>
+
+        <!-- Line Items Table -->
+        <div class="table-responsive mb-4">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light small">
+              <tr>
+                <th>Description</th>
+                <th class="text-center">Rate / Day</th>
+                <th class="text-center">Days</th>
+                <th class="text-end">Amount (INR)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong id="invItemTitle">Rental Item</strong>
+                  <div class="text-muted small" id="invItemCat">Category</div>
+                </td>
+                <td class="text-center" id="invDailyRate">₹0.00</td>
+                <td class="text-center" id="invRentalDays">0</td>
+                <td class="text-end" id="invBaseRent">₹0.00</td>
+              </tr>
+              <tr id="invDiscountRow">
+                <td colspan="3" class="text-success small">Duration Tier Discount</td>
+                <td class="text-end text-success" id="invDiscountVal">-₹0.00</td>
+              </tr>
+              <tr>
+                <td colspan="3" class="text-muted small">Refundable Security Deposit (Held in Custody)</td>
+                <td class="text-end" id="invDepositVal">₹0.00</td>
+              </tr>
+            </tbody>
+            <tfoot class="border-top-2">
+              <tr class="table-light">
+                <th colspan="3" class="text-end fs-5">Total Payable Amount:</th>
+                <th class="text-end fs-5 text-primary" id="invTotalAmount">₹0.00</th>
+              </tr>
+              <tr>
+                <th colspan="3" class="text-end text-muted small">Amount Paid to Date:</th>
+                <td class="text-end text-success fw-semibold" id="invPaidAmount">₹0.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Note & Terms -->
+        <div class="border-top pt-3 text-muted small">
+          <h6 class="fw-bold mb-1 text-dark">Terms & Security Deposit Policy:</h6>
+          <p class="mb-1">1. The security deposit is fully refundable upon return inspection assuming item is returned on time without physical damages.</p>
+          <p class="mb-0">2. Any overdue days will accrue standard daily late fees deducted from the refundable security deposit.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer-custom no-print">
+    <div class="container text-center small text-muted">
+      &copy; 2026 Smart Rental Management System. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    async function loadBill() {
+      const params = new URLSearchParams(window.location.search);
+      const bookingId = params.get('booking_id');
+      if (!bookingId) {
+        window.location.href = 'customer-dashboard.html';
+        return;
+      }
+
+      try {
+        const res = await API.get(`/invoices/${bookingId}`);
+        const inv = res.invoice;
+        if (!inv) throw new Error('Invoice not found');
+
+        document.getElementById('invNumber').textContent = inv.invoice_number;
+        document.getElementById('invDate').textContent = formatDate(inv.issue_date);
+        document.getElementById('invCustomerName').textContent = inv.customer_name || 'Customer';
+        document.getElementById('invBookingCode').textContent = inv.booking_code;
+        document.getElementById('invItemTitle').textContent = inv.item_title || 'Rental Item';
+        document.getElementById('invTotalAmount').textContent = formatCurrency(inv.total_amount);
+        document.getElementById('invPaidAmount').textContent = formatCurrency(inv.paid_amount);
+
+        const statusEl = document.getElementById('invPaymentStatus');
+        statusEl.textContent = (inv.payment_status || 'unpaid').toUpperCase();
+        statusEl.className = `badge fs-6 mb-2 ${inv.payment_status === 'paid' ? 'bg-success' : 'bg-warning text-dark'}`;
+
+        // Get booking for breakdown details
+        const bRes = await API.get(`/bookings/${bookingId}`);
+        const b = bRes.booking;
+        if (b) {
+          document.getElementById('invSchedule').textContent = `${formatDate(b.start_date)} to ${formatDate(b.end_date)}`;
+          document.getElementById('invDays').textContent = `${b.rental_days} days`;
+          document.getElementById('invRentalDays').textContent = b.rental_days;
+          document.getElementById('invDailyRate').textContent = formatCurrency(b.daily_rate);
+          document.getElementById('invBaseRent').textContent = formatCurrency(b.base_rent);
+          document.getElementById('invItemCat').textContent = b.category || 'Rental Item';
+          document.getElementById('invDepositVal').textContent = formatCurrency(b.security_deposit);
+
+          if (b.discount_amount > 0) {
+            document.getElementById('invDiscountRow').style.display = 'table-row';
+            document.getElementById('invDiscountVal').textContent = `-${formatCurrency(b.discount_amount)}`;
+          } else {
+            document.getElementById('invDiscountRow').style.display = 'none';
+          }
+        }
+
+        const payBtn = document.getElementById('btnPayFromBill');
+        payBtn.href = `payment.html?booking_id=${bookingId}`;
+        if (inv.payment_status === 'paid') {
+          payBtn.classList.add('disabled');
+          payBtn.textContent = 'Bill Paid';
+        }
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBill);
+  </script>
+</body>
+</html>

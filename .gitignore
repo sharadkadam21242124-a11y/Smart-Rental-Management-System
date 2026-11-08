@@ -1,0 +1,39 @@
+# Build directories and outputs
+build/
+bin/
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.ninja
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.pdb
+*.ilk
+*.exp
+
+# Database credentials and local secrets
+config/database.json
+config/database_credentials.json
+.env
+.env.*
+*.secret
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.suo
+*.user
+*.vcxproj*
+
+# Temporary and Log files
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db

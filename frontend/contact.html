@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="bikes.html">Bikes</a></li>
+          <li class="nav-item"><a class="nav-link" href="houses.html">Houses</a></li>
+          <li class="nav-item"><a class="nav-link" href="furniture.html">Furniture</a></li>
+          <li class="nav-item"><a class="nav-link" href="search.html"><i class="fa-solid fa-magnifying-glass me-1"></i>Search</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link active" href="contact.html">Contact</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="py-5 text-white text-center" style="background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));">
+    <div class="container">
+      <h1 class="fw-bold mb-2">Get in Touch with Our Team</h1>
+      <p class="text-info fs-5 mb-0">Have questions about our vehicle fleet, properties, or billing? We're here to help.</p>
+    </div>
+  </header>
+
+  <main class="py-5">
+    <div class="container">
+      <div class="row g-4 justify-content-center">
+        <div class="col-lg-7">
+          <div class="custom-card p-4 p-md-5 bg-white">
+            <h4 class="fw-bold mb-4">Send Us a Message</h4>
+            <form id="contactForm" onsubmit="handleContactSubmit(event)">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Your Name *</label>
+                  <input type="text" class="form-control" id="contactName" required placeholder="Aarav Sharma">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Your Email *</label>
+                  <input type="email" class="form-control" id="contactEmail" required placeholder="name@example.com">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold">Subject *</label>
+                  <select class="form-select" id="contactSubject" required>
+                    <option value="">Choose inquiry topic...</option>
+                    <option value="Car Rental">Car Rental Fleet Query</option>
+                    <option value="Bike Rental">Two-Wheeler Rental Query</option>
+                    <option value="House Lease">Property & House Lease Terms</option>
+                    <option value="Furniture Subscription">Furniture Rental & Delivery</option>
+                    <option value="Billing & Refund">Billing, Deposit Refund or Invoice</option>
+                    <option value="Academic Project">Academic Viva & Code Inquiry</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold">Message Description *</label>
+                  <textarea class="form-control" id="contactMessage" rows="5" required placeholder="Write your message here..."></textarea>
+                </div>
+                <div class="col-12 mt-4">
+                  <button type="submit" class="btn btn-primary-custom w-100 py-2 fw-semibold">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Submit Message
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="custom-card p-4 bg-white mb-4">
+            <h5 class="fw-bold mb-3">Support Contacts</h5>
+            <div class="d-flex gap-3 mb-3">
+              <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-envelope"></i></div>
+              <div>
+                <h6 class="fw-bold mb-0">Email Support</h6>
+                <p class="text-muted small mb-0">support@smartrental.com</p>
+                <p class="text-muted small mb-0">admin@smartrental.com</p>
+              </div>
+            </div>
+            <div class="d-flex gap-3 mb-3">
+              <div class="stat-icon stat-icon-emerald"><i class="fa-solid fa-phone"></i></div>
+              <div>
+                <h6 class="fw-bold mb-0">Customer Helpline</h6>
+                <p class="text-muted small mb-0">+91 98201 11223 (Toll Free)</p>
+                <p class="text-muted small mb-0">Mon - Sat: 9:00 AM - 8:00 PM IST</p>
+              </div>
+            </div>
+            <div class="d-flex gap-3">
+              <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-location-dot"></i></div>
+              <div>
+                <h6 class="fw-bold mb-0">Regional Hubs</h6>
+                <p class="text-muted small mb-0">Bengaluru, Mumbai, Pune, Delhi NCR, Hyderabad, Chennai & Kolkata</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="custom-card p-4 bg-primary text-white">
+            <h5 class="fw-bold mb-2"><i class="fa-solid fa-circle-info me-2 text-info"></i>Demo System Note</h5>
+            <p class="small text-white-50 mb-0">
+              This system is an academic software demonstration running on a local C++ server and MySQL 8.0 database. Messages submitted here are recorded into the system audit trail.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-custom">
+    <div class="container text-center small text-muted">
+      &copy; 2026 Smart Rental Management System. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('contactName').value;
+      showToast(`Thank you, ${name}! Your inquiry has been received. Our team will contact you shortly.`, 'success');
+      document.getElementById('contactForm').reset();
+    }
+  </script>
+</body>
+</html>

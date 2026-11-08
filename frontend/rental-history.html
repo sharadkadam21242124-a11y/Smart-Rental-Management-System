@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rental History & Receipts | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-title">Customer Portal</div>
+      <a href="customer-dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+      <a href="my-bookings.html" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i>My Bookings</a>
+      <a href="rental-history.html" class="sidebar-link active"><i class="fa-solid fa-clock-rotate-left"></i>Rental History</a>
+      <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user"></i>My Profile</a>
+
+      <div class="sidebar-title mt-4">Browse Catalog</div>
+      <a href="cars.html" class="sidebar-link"><i class="fa-solid fa-car"></i>Cars</a>
+      <a href="bikes.html" class="sidebar-link"><i class="fa-solid fa-motorcycle"></i>Bikes</a>
+      <a href="houses.html" class="sidebar-link"><i class="fa-solid fa-house"></i>Houses</a>
+      <a href="furniture.html" class="sidebar-link"><i class="fa-solid fa-couch"></i>Furniture</a>
+
+      <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="sidebar-link text-danger">
+          <i class="fa-solid fa-right-from-bracket"></i>Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+      <h2 class="fw-bold mb-1">Rental History & Payment Transactions</h2>
+      <p class="text-muted small mb-4">Complete archival records of your completed leases, payments, and deposit refunds</p>
+
+      <!-- Nav Tabs -->
+      <ul class="nav nav-tabs mb-4" id="historyTabs" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active fw-semibold" id="tab-payments-btn" data-bs-toggle="tab" data-bs-target="#tabPayments">
+            <i class="fa-solid fa-receipt me-1"></i>Payment Transactions
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-semibold" id="tab-closed-btn" data-bs-toggle="tab" data-bs-target="#tabClosed">
+            <i class="fa-solid fa-box-archive me-1"></i>Completed Rentals
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="historyTabsContent">
+        <!-- Tab 1: Payments -->
+        <div class="tab-pane fade show active" id="tabPayments">
+          <div class="custom-card p-4 bg-white shadow-sm">
+            <h5 class="fw-bold mb-3">All Recorded Transactions</h5>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small">
+                  <tr>
+                    <th>Txn ID</th>
+                    <th>Booking Code</th>
+                    <th>Payment Method</th>
+                    <th>Payment Type</th>
+                    <th>Amount (INR)</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Remarks</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentsTbody">
+                  <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                      <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading payments...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Completed Rentals -->
+        <div class="tab-pane fade" id="tabClosed">
+          <div class="custom-card p-4 bg-white shadow-sm">
+            <h5 class="fw-bold mb-3">Closed & Returned Leases</h5>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small">
+                  <tr>
+                    <th>Booking Code</th>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Rental Dates</th>
+                    <th>Duration</th>
+                    <th>Final Total</th>
+                    <th>Status</th>
+                    <th>Bill</th>
+                  </tr>
+                </thead>
+                <tbody id="closedBookingsTbody">
+                  <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">Loading completed rentals...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    async function loadHistory() {
+      const user = API.getUser();
+      if (!user || !API.getToken()) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Load Payments
+      try {
+        const pRes = await API.get('/payments');
+        const payments = pRes.payments || [];
+        const pTbody = document.getElementById('paymentsTbody');
+
+        if (payments.length === 0) {
+          pTbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">No payment records found.</td>
+            </tr>
+          `;
+        } else {
+          pTbody.innerHTML = payments.map(p => `
+            <tr>
+              <td><strong class="font-monospace text-dark">${p.transaction_id}</strong></td>
+              <td><span class="font-monospace text-primary">${p.booking_code || '-'}</span></td>
+              <td><span class="badge bg-light text-dark border">${p.payment_method}</span></td>
+              <td><span class="badge ${p.payment_type === 'Deposit Refund' ? 'bg-info text-dark' : 'bg-primary'}">${p.payment_type}</span></td>
+              <td><strong class="${p.payment_type === 'Deposit Refund' ? 'text-success' : 'text-dark'}">${formatCurrency(p.amount)}</strong></td>
+              <td><span class="badge ${p.payment_status === 'refunded' ? 'bg-info text-dark' : 'bg-success'} text-capitalize">${p.payment_status}</span></td>
+              <td class="small text-muted">${formatDate(p.payment_date)}</td>
+              <td class="small text-muted">${p.remarks || '-'}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+
+      // Load Closed Bookings
+      try {
+        const bRes = await API.get('/bookings');
+        const bookings = bRes.bookings || [];
+        const closed = bookings.filter(b => b.booking_status === 'completed');
+        const cTbody = document.getElementById('closedBookingsTbody');
+
+        if (closed.length === 0) {
+          cTbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">No completed rentals yet.</td>
+            </tr>
+          `;
+        } else {
+          cTbody.innerHTML = closed.map(b => `
+            <tr>
+              <td><strong class="font-monospace text-primary">${b.booking_code}</strong></td>
+              <td><strong class="text-dark">${b.item_title}</strong></td>
+              <td><span class="badge badge-category position-static badge-${b.category || 'Car'} py-0 px-2">${b.category}</span></td>
+              <td class="small text-muted">${formatDate(b.start_date)} to ${formatDate(b.end_date)}</td>
+              <td>${b.rental_days} days</td>
+              <td><strong>${formatCurrency(b.total_amount)}</strong></td>
+              <td><span class="badge bg-success text-capitalize">${b.booking_status}</span></td>
+              <td>
+                <a href="billing.html?booking_id=${b.id}" class="btn btn-sm btn-outline-secondary">
+                  <i class="fa-solid fa-file-invoice me-1"></i>Invoice
+                </a>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadHistory);
+  </script>
+</body>
+</html>

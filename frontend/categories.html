@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rental Categories | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="bikes.html">Bikes</a></li>
+          <li class="nav-item"><a class="nav-link" href="houses.html">Houses</a></li>
+          <li class="nav-item"><a class="nav-link" href="furniture.html">Furniture</a></li>
+          <li class="nav-item"><a class="nav-link" href="search.html"><i class="fa-solid fa-magnifying-glass me-1"></i>Search</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="py-5 text-white text-center" style="background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy));">
+    <div class="container">
+      <h1 class="fw-bold mb-2">Explore 4 Premier Rental Categories</h1>
+      <p class="text-info fs-5 mb-0">Discover verified items with transparent daily rates, tiered discounts & refundable security deposits</p>
+    </div>
+  </header>
+
+  <main class="py-5">
+    <div class="container">
+      <div class="row g-4">
+        <!-- 1. Car Rental -->
+        <div class="col-lg-6">
+          <div class="custom-card p-4 h-100 d-flex flex-column">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-car"></i></div>
+              <div>
+                <h4 class="fw-bold mb-0">1. Car Rental Fleet</h4>
+                <span class="badge bg-primary">Automotive Specialization</span>
+              </div>
+            </div>
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800" class="rounded-3 mb-3" style="height: 220px; object-fit: cover;" alt="Car Rental">
+            <p class="text-muted small flex-grow-1">
+              Top Indian brand models (Tata Harrier, Hyundai Creta, Mahindra Thar, Toyota Fortuner). Available in Petrol, Diesel, CNG & EV with Manual or Automatic transmission.
+            </p>
+            <div class="bg-light p-3 rounded-3 mb-3 small">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Daily Rates:</span><strong>₹1,400 to ₹5,500/day</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span>Duration Discounts:</span><span class="text-success fw-bold">10% off for 7+ days, 15% off for 14+ days</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Security Deposit:</span><span>Refundable upon return</span>
+              </div>
+            </div>
+            <a href="cars.html" class="btn btn-primary-custom w-100 fw-semibold"><i class="fa-solid fa-car me-2"></i>Browse All Cars</a>
+          </div>
+        </div>
+
+        <!-- 2. Bike Rental -->
+        <div class="col-lg-6">
+          <div class="custom-card p-4 h-100 d-flex flex-column">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="stat-icon stat-icon-emerald"><i class="fa-solid fa-motorcycle"></i></div>
+              <div>
+                <h4 class="fw-bold mb-0">2. Bike Rental Fleet</h4>
+                <span class="badge bg-success">Two-Wheeler Specialization</span>
+              </div>
+            </div>
+            <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800" class="rounded-3 mb-3" style="height: 220px; object-fit: cover;" alt="Bike Rental">
+            <p class="text-muted small flex-grow-1">
+              From city commuter scooters like Honda Activa and Ather EV to legendary cruisers like Royal Enfield Classic 350 and KTM Duke 390. Includes sanitised DOT helmets.
+            </p>
+            <div class="bg-light p-3 rounded-3 mb-3 small">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Daily Rates:</span><strong>₹450 to ₹1,800/day</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span>Duration Discounts:</span><span class="text-success fw-bold">5% off for 5+ days, 12% off for 10+ days</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Helmet Included:</span><span>Complimentary</span>
+              </div>
+            </div>
+            <a href="bikes.html" class="btn btn-accent w-100 fw-semibold" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-motorcycle me-2"></i>Browse All Bikes</a>
+          </div>
+        </div>
+
+        <!-- 3. House Rental -->
+        <div class="col-lg-6">
+          <div class="custom-card p-4 h-100 d-flex flex-column">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-house"></i></div>
+              <div>
+                <h4 class="fw-bold mb-0">3. House & Property Rental</h4>
+                <span class="badge bg-warning text-dark">Real Estate Specialization</span>
+              </div>
+            </div>
+            <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800" class="rounded-3 mb-3" style="height: 220px; object-fit: cover;" alt="House Rental">
+            <p class="text-muted small flex-grow-1">
+              Studio apartments, 2/3 BHK fully-furnished urban flats, and luxury seaside holiday villas across Bengaluru, Mumbai, Pune, Gurugram, and Goa.
+            </p>
+            <div class="bg-light p-3 rounded-3 mb-3 small">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Daily Rates:</span><strong>₹1,200 to ₹8,000/day</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span>Monthly Discounts:</span><span class="text-success fw-bold">10% off for 14+ days, 20% off for 30+ days</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Furnishing:</span><span>Furnished / Semi-Furnished</span>
+              </div>
+            </div>
+            <a href="houses.html" class="btn btn-accent w-100 fw-semibold" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><i class="fa-solid fa-house me-2"></i>Browse All Houses</a>
+          </div>
+        </div>
+
+        <!-- 4. Furniture Rental -->
+        <div class="col-lg-6">
+          <div class="custom-card p-4 h-100 d-flex flex-column">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="stat-icon stat-icon-rose"><i class="fa-solid fa-couch"></i></div>
+              <div>
+                <h4 class="fw-bold mb-0">4. Furniture & Living Essentials</h4>
+                <span class="badge bg-purple text-white" style="background-color: #9333ea;">Home & Office Specialization</span>
+              </div>
+            </div>
+            <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800" class="rounded-3 mb-3" style="height: 220px; object-fit: cover;" alt="Furniture Rental">
+            <p class="text-muted small flex-grow-1">
+              Solid Sheesham rosewood beds, motorized leatherette recliners, ergonomic high-back mesh office chairs, and 6-seater dining sets delivered sanitized.
+            </p>
+            <div class="bg-light p-3 rounded-3 mb-3 small">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Daily Rates:</span><strong>₹90 to ₹350/day</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span>Tiered Discounts:</span><span class="text-success fw-bold">15% off for 14+ days, 25% off for 30+ days</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Condition:</span><span>Brand New / Like New</span>
+              </div>
+            </div>
+            <a href="furniture.html" class="btn btn-accent w-100 fw-semibold" style="background: linear-gradient(135deg, #9333ea, #7e22ce);"><i class="fa-solid fa-couch me-2"></i>Browse All Furniture</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-custom">
+    <div class="container text-center small text-muted">
+      &copy; 2026 Smart Rental Management System. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+</body>
+</html>

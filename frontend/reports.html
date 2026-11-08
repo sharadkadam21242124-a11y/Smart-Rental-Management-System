@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports & Financial Analytics | Admin Console</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);"><i class="fa-solid fa-shield-halved"></i></div>
+        <span>Smart Rental <small class="fw-normal text-info fs-6">| Admin Console</small></span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar" style="background-color: #0d1b2a;">
+      <div class="sidebar-title">Administration</div>
+      <a href="admin-dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+      <a href="manage-items.html" class="sidebar-link"><i class="fa-solid fa-boxes-stacked"></i>Manage Items</a>
+      <a href="manage-customers.html" class="sidebar-link"><i class="fa-solid fa-users"></i>Manage Customers</a>
+      <a href="manage-bookings.html" class="sidebar-link"><i class="fa-solid fa-list-check"></i>Manage Bookings</a>
+      <a href="manage-payments.html" class="sidebar-link"><i class="fa-solid fa-money-check-dollar"></i>Manage Payments</a>
+      <a href="return-management.html" class="sidebar-link"><i class="fa-solid fa-arrow-rotate-left"></i>Return Check-in</a>
+      <a href="reports.html" class="sidebar-link active"><i class="fa-solid fa-chart-line"></i>Reports & Analytics</a>
+      <a href="admin-profile.html" class="sidebar-link"><i class="fa-solid fa-user-gear"></i>Admin Profile</a>
+
+      <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="sidebar-link text-danger">
+          <i class="fa-solid fa-right-from-bracket"></i>Logout
+        </a>
+      </div>
+    </aside>
+
+    <main class="dashboard-content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Financial & Fleet Reports</h2>
+          <p class="text-muted small mb-0">Audited revenue metrics, duration analytics, category distribution & CSV file exports</p>
+        </div>
+        <div class="mt-2 mt-md-0 d-flex flex-wrap gap-2">
+          <a href="/api/reports/export/revenue" target="_blank" class="btn btn-outline-success btn-sm">
+            <i class="fa-solid fa-file-csv me-1"></i>Export Revenue CSV
+          </a>
+          <a href="/api/reports/export/bookings" target="_blank" class="btn btn-outline-primary btn-sm">
+            <i class="fa-solid fa-file-csv me-1"></i>Export Bookings CSV
+          </a>
+          <a href="/api/reports/export/inventory" target="_blank" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-file-csv me-1"></i>Export Inventory CSV
+          </a>
+        </div>
+      </div>
+
+      <!-- Financial Integrity Metrics Row -->
+      <div class="custom-card p-4 bg-white shadow-sm mb-4">
+        <h5 class="fw-bold mb-3 border-bottom pb-2">Audited Financial Breakdown</h5>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3">
+              <span class="text-muted small text-uppercase">1. Earned Rental Revenue</span>
+              <h4 class="fw-bold text-primary mb-1" id="repEarnedRent">₹0.00</h4>
+              <p class="small text-muted mb-0">Gross rental charges minus duration discounts</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3">
+              <span class="text-muted small text-uppercase">2. Security Deposits in Custody</span>
+              <h4 class="fw-bold text-dark mb-1" id="repDepositsHeld">₹0.00</h4>
+              <p class="small text-muted mb-0">Active refundable customer liability (held in trust)</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3">
+              <span class="text-muted small text-uppercase">3. Deposits Refunded</span>
+              <h4 class="fw-bold text-success mb-1" id="repDepositsRef">₹0.00</h4>
+              <p class="small text-muted mb-0">Safely returned to customers upon check-in</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3">
+              <span class="text-muted small text-uppercase">4. Late Fees Collected</span>
+              <h4 class="fw-bold text-danger mb-1" id="repLateFees">₹0.00</h4>
+              <p class="small text-muted mb-0">Accrued from overdue return check-ins</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3">
+              <span class="text-muted small text-uppercase">5. Damage Charges Deducted</span>
+              <h4 class="fw-bold text-danger mb-1" id="repDamages">₹0.00</h4>
+              <p class="small text-muted mb-0">Deducted for physical repairs and maintenance</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
+              <span class="text-primary fw-bold small text-uppercase">Net Operational Revenue</span>
+              <h3 class="fw-bold text-primary mb-1" id="repNetTotal">₹0.00</h3>
+              <p class="small text-muted mb-0">Earned Rent + Late Fees + Damage Charges</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+          <div class="custom-card p-4 bg-white shadow-sm">
+            <h5 class="fw-bold mb-3">Monthly Revenue (INR)</h5>
+            <div style="height: 280px; position: relative;">
+              <canvas id="repRevenueChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="custom-card p-4 bg-white shadow-sm">
+            <h5 class="fw-bold mb-3">Category Distribution</h5>
+            <div style="height: 280px; position: relative;">
+              <canvas id="repCategoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Breakdown Table -->
+      <div class="custom-card p-4 bg-white shadow-sm">
+        <h5 class="fw-bold mb-3">Category Telemetry & Counts</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle mb-0">
+            <thead class="table-light small">
+              <tr>
+                <th>Category Name</th>
+                <th>Active Inventory Items</th>
+                <th>Discount Policy Rule</th>
+                <th>Inspection Protocol</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-category position-static badge-Car py-1 px-3">Cars</span></td>
+                <td>10 Vehicles</td>
+                <td>10% off for 7+ days, 15% off for 14+ days</td>
+                <td>Fuel tank level, odometer mileage, exterior scratches</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-category position-static badge-Bike py-1 px-3">Bikes</span></td>
+                <td>10 Motorbikes / Scooters</td>
+                <td>5% off for 5+ days, 12% off for 10+ days</td>
+                <td>Helmet return check, tyre tread, side mirrors</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-category position-static badge-House py-1 px-3">Houses</span></td>
+                <td>10 Properties</td>
+                <td>10% off for 14+ days, 20% off for 30+ days</td>
+                <td>Key handover, electricity meter reading, furnishing state</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-category position-static badge-Furniture py-1 px-3">Furniture</span></td>
+                <td>10 Furniture Sets</td>
+                <td>15% off for 14+ days, 25% off for 30+ days</td>
+                <td>Fabric stains, structural joint integrity, upholstery</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    async function loadReports() {
+      try {
+        const res = await API.get('/admin/dashboard');
+        const s = res.stats;
+        if (s) {
+          document.getElementById('repEarnedRent').textContent = formatCurrency(s.earned_rental_revenue);
+          document.getElementById('repDepositsHeld').textContent = formatCurrency(s.security_deposits_held);
+          document.getElementById('repDepositsRef').textContent = formatCurrency(s.security_deposits_refunded);
+          document.getElementById('repLateFees').textContent = formatCurrency(s.late_fees_collected);
+          document.getElementById('repDamages').textContent = formatCurrency(s.damage_charges_collected);
+          document.getElementById('repNetTotal').textContent = formatCurrency(s.net_revenue);
+        }
+
+        // Revenue Chart
+        const revRes = await API.get('/reports/revenue');
+        const monthly = revRes.data.monthly || [];
+        new Chart(document.getElementById('repRevenueChart'), {
+          type: 'bar',
+          data: {
+            labels: monthly.map(m => m.month),
+            datasets: [{
+              label: 'Revenue (INR)',
+              data: monthly.map(m => m.revenue),
+              backgroundColor: '#2563eb',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+
+        // Category Chart
+        const catRes = await API.get('/reports/categories');
+        const catData = catRes.categories || [];
+        new Chart(document.getElementById('repCategoryChart'), {
+          type: 'pie',
+          data: {
+            labels: catData.map(c => c.category),
+            datasets: [{
+              data: catData.map(c => c.count),
+              backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#9333ea']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadReports);
+  </script>
+</body>
+</html>

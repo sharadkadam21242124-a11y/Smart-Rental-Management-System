@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Bookings | Admin Console</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);"><i class="fa-solid fa-shield-halved"></i></div>
+        <span>Smart Rental <small class="fw-normal text-info fs-6">| Admin Console</small></span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar" style="background-color: #0d1b2a;">
+      <div class="sidebar-title">Administration</div>
+      <a href="admin-dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+      <a href="manage-items.html" class="sidebar-link"><i class="fa-solid fa-boxes-stacked"></i>Manage Items</a>
+      <a href="manage-customers.html" class="sidebar-link"><i class="fa-solid fa-users"></i>Manage Customers</a>
+      <a href="manage-bookings.html" class="sidebar-link active"><i class="fa-solid fa-list-check"></i>Manage Bookings</a>
+      <a href="manage-payments.html" class="sidebar-link"><i class="fa-solid fa-money-check-dollar"></i>Manage Payments</a>
+      <a href="return-management.html" class="sidebar-link"><i class="fa-solid fa-arrow-rotate-left"></i>Return Check-in</a>
+      <a href="reports.html" class="sidebar-link"><i class="fa-solid fa-chart-line"></i>Reports & Analytics</a>
+      <a href="admin-profile.html" class="sidebar-link"><i class="fa-solid fa-user-gear"></i>Admin Profile</a>
+
+      <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="sidebar-link text-danger">
+          <i class="fa-solid fa-right-from-bracket"></i>Logout
+        </a>
+      </div>
+    </aside>
+
+    <main class="dashboard-content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Customer Rental Bookings</h2>
+          <p class="text-muted small mb-0">Review all active, confirmed, completed, and cancelled rental bookings</p>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="custom-card p-3 mb-4 bg-white">
+        <div class="row g-2">
+          <div class="col-md-5">
+            <input type="text" class="form-control form-control-sm" id="bookingSearchInput" placeholder="Search by booking code, customer, or item..." onkeyup="filterBookings()">
+          </div>
+          <div class="col-md-4">
+            <select class="form-select form-select-sm" id="bookingStatusSelect" onchange="filterBookings()">
+              <option value="">All Statuses</option>
+              <option value="active">Active Rentals</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed & Returned</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-outline-secondary btn-sm w-100" onclick="loadAllBookings()">Refresh List</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="custom-card p-4 bg-white shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small">
+              <tr>
+                <th>Booking Code</th>
+                <th>Customer</th>
+                <th>Rental Item</th>
+                <th>Schedule</th>
+                <th>Days</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="allBookingsTbody">
+              <tr><td colspan="8" class="text-center py-4 text-muted">Loading bookings...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let allAdminBookings = [];
+
+    async function loadAllBookings() {
+      try {
+        const res = await API.get('/bookings');
+        allAdminBookings = res.bookings || [];
+        renderBookings(allAdminBookings);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function renderBookings(items) {
+      const tbody = document.getElementById('allBookingsTbody');
+      if (items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No bookings found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = items.map(b => `
+        <tr>
+          <td><strong class="font-monospace text-primary">${b.booking_code}</strong></td>
+          <td>
+            <div class="fw-semibold">${b.customer_name || 'Customer #' + b.customer_id}</div>
+          </td>
+          <td>
+            <strong class="text-dark">${b.item_title}</strong>
+            <div><span class="badge badge-category position-static badge-${b.category || 'Car'} py-0 px-2" style="font-size: 0.7rem;">${b.category}</span></div>
+          </td>
+          <td class="small text-muted">${formatDate(b.start_date)} to ${formatDate(b.end_date)}</td>
+          <td>${b.rental_days} d</td>
+          <td><strong>${formatCurrency(b.total_amount)}</strong></td>
+          <td>
+            <span class="badge ${getStatusBadge(b.booking_status)} text-capitalize">${b.booking_status}</span>
+          </td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="billing.html?booking_id=${b.id}" class="btn btn-sm btn-outline-secondary" title="View Bill"><i class="fa-solid fa-file-invoice"></i></a>
+              ${b.booking_status !== 'completed' && b.booking_status !== 'cancelled' ? `
+              <button class="btn btn-sm btn-outline-danger" onclick="adminCancelBooking(${b.id})" title="Cancel"><i class="fa-solid fa-ban"></i></button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterBookings() {
+      const q = document.getElementById('bookingSearchInput').value.toLowerCase();
+      const status = document.getElementById('bookingStatusSelect').value;
+
+      const filtered = allAdminBookings.filter(b => {
+        const mQ = !q || b.booking_code.toLowerCase().includes(q) || (b.customer_name && b.customer_name.toLowerCase().includes(q)) || (b.item_title && b.item_title.toLowerCase().includes(q));
+        const mStatus = !status || b.booking_status === status;
+        return mQ && mStatus;
+      });
+      renderBookings(filtered);
+    }
+
+    async function adminCancelBooking(id) {
+      if (!confirm('Are you sure you want to cancel this booking? The rental item will be immediately released back to available.')) return;
+      try {
+        await API.put(`/bookings/${id}/cancel`);
+        showToast('Booking cancelled and item released', 'info');
+        loadAllBookings();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'active': return 'bg-primary';
+        case 'confirmed': return 'bg-info text-dark';
+        case 'completed': return 'bg-success';
+        case 'cancelled': return 'bg-danger';
+        default: return 'bg-warning text-dark';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAllBookings);
+  </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Profile | Smart Rental Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks"></ul>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-title">Customer Portal</div>
+      <a href="customer-dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+      <a href="my-bookings.html" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i>My Bookings</a>
+      <a href="rental-history.html" class="sidebar-link"><i class="fa-solid fa-clock-rotate-left"></i>Rental History</a>
+      <a href="profile.html" class="sidebar-link active"><i class="fa-solid fa-user"></i>My Profile</a>
+      <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="sidebar-link text-danger">
+          <i class="fa-solid fa-right-from-bracket"></i>Logout
+        </a>
+      </div>
+    </aside>
+
+    <main class="dashboard-content">
+      <h2 class="fw-bold mb-1">My Customer Profile</h2>
+      <p class="text-muted small mb-4">View and update your personal information and account settings</p>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="custom-card p-4 p-md-5 bg-white mb-4">
+            <h5 class="fw-bold mb-3 border-bottom pb-2">Profile Information</h5>
+            <form id="profileForm" onsubmit="handleProfileUpdate(event)">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Full Legal Name</label>
+                  <input type="text" class="form-control" id="profName" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Email Address (Read-Only)</label>
+                  <input type="email" class="form-control bg-light" id="profEmail" readonly disabled>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Mobile Phone</label>
+                  <input type="tel" class="form-control" id="profPhone" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">National ID / Aadhaar</label>
+                  <input type="text" class="form-control" id="profIdProof" placeholder="AADHAAR-XXXXXXXXXXXX">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold">Residential Delivery Address</label>
+                  <textarea class="form-control" id="profAddress" rows="3" required></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Driving License Number</label>
+                  <input type="text" class="form-control" id="profDl" placeholder="DL-XXXXXXXXXXXXXXX">
+                </div>
+                <div class="col-12 mt-4">
+                  <button type="submit" class="btn btn-primary-custom px-4 fw-semibold">
+                    <i class="fa-solid fa-save me-2"></i>Save Profile Changes
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="custom-card p-4 bg-white mb-4 text-center">
+            <div class="brand-icon mx-auto mb-3" style="width: 64px; height: 64px; font-size: 2rem;">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+            <h5 class="fw-bold mb-1" id="badgeProfName">Customer</h5>
+            <span class="badge bg-success mb-3">Active Account</span>
+            <div class="small text-muted text-start border-top pt-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Account Role:</span><strong>Customer</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span>Database ID:</span><span class="font-monospace" id="badgeProfId">#1</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Member Since:</span><span id="badgeProfCreated">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    async function loadProfile() {
+      const user = API.getUser();
+      if (!user || !API.getToken()) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        const res = await API.get('/profile');
+        const p = res.profile;
+        if (!p) throw new Error('Profile not found');
+
+        document.getElementById('profName').value = p.full_name || '';
+        document.getElementById('profEmail').value = p.email || '';
+        document.getElementById('profPhone').value = p.phone || '';
+        document.getElementById('profAddress').value = p.address || '';
+        document.getElementById('profIdProof').value = p.id_proof_number || '';
+        document.getElementById('profDl').value = p.driving_license_number || '';
+
+        document.getElementById('badgeProfName').textContent = p.full_name || 'Customer';
+        document.getElementById('badgeProfId').textContent = '#' + (p.customer_id || p.id);
+        document.getElementById('badgeProfCreated').textContent = formatDate(p.created_at);
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function handleProfileUpdate(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+
+      const payload = {
+        full_name: document.getElementById('profName').value.trim(),
+        phone: document.getElementById('profPhone').value.trim(),
+        address: document.getElementById('profAddress').value.trim()
+      };
+
+      try {
+        const res = await API.put('/profile', payload);
+        showToast(res.message || 'Profile information successfully saved!', 'success');
+        const user = API.getUser();
+        if (user) {
+          user.full_name = payload.full_name;
+          user.phone = payload.phone;
+          API.setUser(user);
+        }
+        loadProfile();
+      } catch (err) {
+        showToast(err.message || 'Failed to update profile.', 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProfile);
+  </script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Rental Management System | Cars, Bikes, Houses & Furniture</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-icon"><i class="fa-solid fa-key"></i></div>
+        <span>Smart Rental</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto ms-lg-3">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link" href="cars.html">Cars</a></li>
+          <li class="nav-item"><a class="nav-link" href="bikes.html">Bikes</a></li>
+          <li class="nav-item"><a class="nav-link" href="houses.html">Houses</a></li>
+          <li class="nav-item"><a class="nav-link" href="furniture.html">Furniture</a></li>
+          <li class="nav-item"><a class="nav-link" href="search.html"><i class="fa-solid fa-magnifying-glass me-1"></i>Search</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-center" id="navbarAuthLinks">
+          <!-- Populated dynamically by api.js based on session -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container position-relative" style="z-index: 2;">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-7">
+          <span class="badge bg-primary bg-opacity-25 text-info px-3 py-2 rounded-pill mb-3 font-monospace">
+            <i class="fa-solid fa-shield-halved me-1"></i> Powered by C++17 OOP & MySQL 8.0
+          </span>
+          <h1 class="hero-title mb-3">Rent Cars, Bikes, Homes & Furniture Seamlessly</h1>
+          <p class="hero-subtitle mb-4">
+            India's premier smart rental platform. Verified vehicles, furnished apartments, and premium home essentials with transparent pricing, instant booking confirmation, and refundable security deposits.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="categories.html" class="btn btn-accent btn-lg px-4"><i class="fa-solid fa-compass me-2"></i>Explore Categories</a>
+            <a href="search.html" class="btn btn-outline-light btn-lg px-4"><i class="fa-solid fa-search me-2"></i>Search All Items</a>
+          </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block text-center">
+          <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80"
+               alt="Rental Preview" class="img-fluid rounded-4 shadow-xl border border-secondary border-opacity-25" style="max-height: 380px; object-fit: cover; width: 100%;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Category Strip -->
+  <section class="py-5 bg-white border-bottom">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="text-primary fw-semibold text-uppercase tracking-wider">Rental Categories</span>
+        <h2 class="fw-bold mt-1">What Would You Like to Rent Today?</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-3 col-6">
+          <a href="cars.html" class="text-decoration-none">
+            <div class="custom-card p-4 text-center h-100">
+              <div class="stat-icon stat-icon-blue mx-auto mb-3"><i class="fa-solid fa-car"></i></div>
+              <h5 class="fw-bold text-dark mb-1">Car Rental</h5>
+              <p class="text-muted small mb-0">Hatchbacks, SUVs & Luxury Sedans</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3 col-6">
+          <a href="bikes.html" class="text-decoration-none">
+            <div class="custom-card p-4 text-center h-100">
+              <div class="stat-icon stat-icon-emerald mx-auto mb-3"><i class="fa-solid fa-motorcycle"></i></div>
+              <h5 class="fw-bold text-dark mb-1">Bike Rental</h5>
+              <p class="text-muted small mb-0">Sports Bikes, Cruisers & Scooters</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3 col-6">
+          <a href="houses.html" class="text-decoration-none">
+            <div class="custom-card p-4 text-center h-100">
+              <div class="stat-icon stat-icon-amber mx-auto mb-3"><i class="fa-solid fa-house"></i></div>
+              <h5 class="fw-bold text-dark mb-1">House Rental</h5>
+              <p class="text-muted small mb-0">Studios, 2/3 BHK & Luxury Villas</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-3 col-6">
+          <a href="furniture.html" class="text-decoration-none">
+            <div class="custom-card p-4 text-center h-100">
+              <div class="stat-icon stat-icon-rose mx-auto mb-3"><i class="fa-solid fa-couch"></i></div>
+              <h5 class="fw-bold text-dark mb-1">Furniture Rental</h5>
+              <p class="text-muted small mb-0">Recliners, Beds, Dining & Desks</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Items -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <span class="text-primary fw-semibold text-uppercase">Handpicked Inventory</span>
+          <h2 class="fw-bold mt-1">Featured Rental Items</h2>
+        </div>
+        <a href="search.html" class="btn btn-outline-primary fw-semibold">View All Items <i class="fa-solid fa-arrow-right ms-1"></i></a>
+      </div>
+
+      <div class="row g-4" id="featuredItemsContainer">
+        <!-- Loaded via C++ API -->
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-2">Loading featured items from C++ backend...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="text-primary fw-semibold text-uppercase">Easy 4-Step Process</span>
+        <h2 class="fw-bold mt-1">How Smart Rental Works</h2>
+      </div>
+      <div class="row g-4 text-center">
+        <div class="col-md-3">
+          <div class="p-3">
+            <div class="brand-icon mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">1</div>
+            <h5 class="fw-bold">Select Category</h5>
+            <p class="text-muted small">Choose between cars, motorbikes, apartments, or premium home furniture.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3">
+            <div class="brand-icon mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">2</div>
+            <h5 class="fw-bold">Pick Your Dates</h5>
+            <p class="text-muted small">Our C++ backend checks availability and applies tiered duration discounts.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3">
+            <div class="brand-icon mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">3</div>
+            <h5 class="fw-bold">Confirm & Pay Demo</h5>
+            <p class="text-muted small">Instant booking code generated with demo UPI, Card or Cash payment receipts.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3">
+            <div class="brand-icon mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">4</div>
+            <h5 class="fw-bold">Enjoy & Return</h5>
+            <p class="text-muted small">Automatic security deposit settlement and return audit handled seamlessly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <span class="text-primary fw-semibold text-uppercase">Why Choose Us</span>
+          <h2 class="fw-bold mb-4">Enterprise-Grade Object-Oriented Engineering</h2>
+          <div class="d-flex gap-3 mb-3">
+            <div class="text-primary fs-4"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <h6 class="fw-bold mb-1">Polymorphic Rent & Discount Engine</h6>
+              <p class="text-muted small">Each rental category calculates pricing dynamically via C++ virtual methods, including automatic 5% to 25% duration discounts.</p>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-3">
+            <div class="text-primary fs-4"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <h6 class="fw-bold mb-1">Double-Booking Collision Prevention</h6>
+              <p class="text-muted small">ACID-compliant MySQL transactions and schedule conflict checks prevent overlapping bookings.</p>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-3">
+            <div class="text-primary fs-4"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <h6 class="fw-bold mb-1">Audited Financial Settlement</h6>
+              <p class="text-muted small">Differentiates true earned rental revenue from refundable customer security deposits.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="custom-card p-4 bg-white shadow-md">
+            <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-code me-2 text-primary"></i>Tech Stack Summary</h5>
+            <ul class="list-group list-group-flush small">
+              <li class="list-group-item d-flex justify-content-between"><span>Backend Language</span><strong class="text-primary">C++17</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span>HTTP Server</span><strong>cpp-httplib</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span>Relational Database</span><strong class="text-success">MySQL 8.0 (InnoDB)</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span>Database GUI</span><strong>MySQL Workbench 8.0</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span>Frontend Engine</span><strong>HTML5, CSS3, JavaScript ES6</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span>Design System</span><strong>Bootstrap 5 & Chart.js</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-custom">
+    <div class="container">
+      <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+          <h5 class="d-flex align-items-center gap-2">
+            <div class="brand-icon" style="width: 28px; height: 28px; font-size: 0.9rem;"><i class="fa-solid fa-key"></i></div>
+            Smart Rental Management
+          </h5>
+          <p class="small text-muted">A comprehensive, full-stack multi-category rental portal engineered with C++17, MySQL 8.0, and modern responsive frontend design.</p>
+        </div>
+        <div class="col-lg-2 col-6">
+          <h5>Categories</h5>
+          <ul class="list-unstyled small">
+            <li><a href="cars.html">Cars</a></li>
+            <li><a href="bikes.html">Bikes</a></li>
+            <li><a href="houses.html">Houses</a></li>
+            <li><a href="furniture.html">Furniture</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-6">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled small">
+            <li><a href="about.html">About Project</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="search.html">Search Catalog</a></li>
+            <li><a href="login.html">Login Portal</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4">
+          <h5>Academic Project Viva</h5>
+          <p class="small text-muted">Designed for Second-Year Computer Engineering viva demonstration covering all 29 Object-Oriented Programming concepts.</p>
+          <span class="badge bg-secondary">Academic Year 2026</span>
+        </div>
+      </div>
+      <div class="text-center pt-3 border-top border-secondary border-opacity-25 small text-muted">
+        &copy; 2026 Smart Rental Management System. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    async function loadFeaturedItems() {
+      const container = document.getElementById('featuredItemsContainer');
+      try {
+        const data = await API.get('/items');
+        if (data.items && data.items.length > 0) {
+          // Show top 6 items
+          const featured = data.items.slice(0, 6);
+          container.innerHTML = featured.map(item => `
+            <div class="col-lg-4 col-md-6">
+              <div class="custom-card position-relative h-100 d-flex flex-column">
+                <span class="badge-category badge-${item.category}">${item.category}</span>
+                <img src="${item.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800'}" alt="${item.title}" class="card-item-img">
+                <div class="p-4 d-flex flex-column flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold mb-0 text-dark">${item.title}</h5>
+                  </div>
+                  <p class="text-muted small mb-3 flex-grow-1">${item.description.substring(0, 85)}...</p>
+                  <div class="d-flex justify-content-between align-items-center mb-3 pt-2 border-top">
+                    <div>
+                      <span class="price-tag">${formatCurrency(item.daily_rate)}</span>
+                      <span class="price-sub">/day</span>
+                    </div>
+                    <span class="badge ${item.status === 'available' ? 'bg-success' : 'bg-warning text-dark'} text-capitalize">${item.status}</span>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="item-details.html?id=${item.id}" class="btn btn-outline-secondary w-50 btn-sm fw-semibold">Details</a>
+                    <a href="booking.html?id=${item.id}" class="btn btn-primary-custom w-50 btn-sm fw-semibold ${item.status !== 'available' ? 'disabled' : ''}">Rent Now</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = `
+            <div class="col-12 empty-state">
+              <i class="fa-solid fa-box-open empty-state-icon"></i>
+              <h5>No items found</h5>
+              <p class="text-muted">Database has not been populated yet. Please execute seed.sql.</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        container.innerHTML = `
+          <div class="col-12 alert alert-warning text-center">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>Backend API connecting: Make sure C++ backend is running.
+          </div>
+        `;
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadFeaturedItems);
+  </script>
+</body>
+</html>

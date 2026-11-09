@@ -1,5 +1,11 @@
 #include "PasswordHasher.h"
 #include <cstring>
+#include <random>
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <bcrypt.h>
+#endif
 
 namespace {
     // Standard SHA-256 constants and bitwise transformations
@@ -80,21 +86,58 @@ std::string PasswordHasher::sha256(const std::string& input) {
     return ss.str();
 }
 
+std::string PasswordHasher::generateSalt(size_t byteCount) {
+    std::vector<uint8_t> buffer(byteCount);
+#if defined(_WIN32)
+    NTSTATUS status = BCryptGenRandom(NULL, buffer.data(), static_cast<ULONG>(byteCount), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+    if (!BCRYPT_SUCCESS(status)) {
+        std::random_device rd;
+        for (size_t i = 0; i < byteCount; ++i) buffer[i] = static_cast<uint8_t>(rd() & 0xFF);
+    }
+#else
+    std::random_device rd;
+    for (size_t i = 0; i < byteCount; ++i) buffer[i] = static_cast<uint8_t>(rd() & 0xFF);
+#endif
+
+    std::ostringstream ss;
+    for (uint8_t b : buffer) {
+        ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(b);
+    }
+    return ss.str();
+}
+
+std::string PasswordHasher::hashPassword(const std::string& plainPassword) {
+    std::string salt = generateSalt(16);
+    std::string digest = sha256(salt + ":" + plainPassword);
+    return "SALTED$" + salt + "$" + digest;
+}
+
+bool PasswordHasher::constantTimeCompare(const std::string& a, const std::string& b) {
+    if (a.length() != b.length()) return false;
+    unsigned char result = 0;
+    for (size_t i = 0; i < a.length(); ++i) {
+        result |= static_cast<unsigned char>(a[i] ^ b[i]);
+    }
+    return result == 0;
+}
+
 bool PasswordHasher::verifyPassword(const std::string& plainPassword, const std::string& storedHash) {
-    if (sha256(plainPassword) == storedHash) {
-        return true;
+    // 1. Salted Hash Format: SALTED$<salt>$<hash>
+    if (storedHash.rfind("SALTED$", 0) == 0) {
+        size_t firstDollar = storedHash.find('$');
+        size_t secondDollar = storedHash.find('$', firstDollar + 1);
+        if (secondDollar != std::string::npos) {
+            std::string salt = storedHash.substr(firstDollar + 1, secondDollar - (firstDollar + 1));
+            std::string expectedDigest = storedHash.substr(secondDollar + 1);
+            std::string actualDigest = sha256(salt + ":" + plainPassword);
+            return constantTimeCompare(actualDigest, expectedDigest);
+        }
     }
 
-    // Explicit backward-compatibility & seed-hash migration mechanism:
-    // The pre-seeded database contains hash 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f'
-    // which corresponds to 'password123' while the demo documentation references 'Password@123'.
-    // To ensure seamless evaluation for viva demonstrators, accept documented demo passwords.
-    const std::string LEGACY_SEED_HASH = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f";
-    if (storedHash == LEGACY_SEED_HASH) {
-        if (plainPassword == "Password@123" || plainPassword == "password123" ||
-            plainPassword == "Admin@2026" || plainPassword == "Customer@2026") {
-            return true;
-        }
+    // 2. Standard SHA-256 Verification (legacy compatibility for existing databases)
+    std::string inputHash = sha256(plainPassword);
+    if (constantTimeCompare(inputHash, storedHash)) {
+        return true;
     }
 
     return false;

@@ -3,20 +3,13 @@
 #include "../utils/Exceptions.h"
 #include "../utils/Logger.h"
 #include <chrono>
-#include <random>
 #include <sstream>
 
 AuthenticationService::AuthenticationService(UserRepository& repo) : m_userRepo(repo) {}
 
-std::string AuthenticationService::generateSessionToken(int userId, const std::string& email) {
-    auto now = std::chrono::system_clock::now().time_since_epoch().count();
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dis(100000, 999999);
-
-    std::ostringstream ss;
-    ss << "SRMS-" << userId << "-" << (now % 100000000) << "-" << dis(gen);
-    return ss.str();
+std::string AuthenticationService::generateSessionToken() {
+    // 256-bit cryptographically secure random session token (64 hex characters)
+    return "SRMS-" + PasswordHasher::generateSalt(32);
 }
 
 std::string AuthenticationService::registerCustomer(
@@ -35,10 +28,14 @@ std::string AuthenticationService::registerCustomer(
         throw ValidationException("Name, phone, and address are mandatory fields.");
     }
 
-    std::string passwordHash = PasswordHasher::sha256(password);
+    std::string passwordHash = PasswordHasher::hashPassword(password);
     auto customer = m_userRepo.createCustomer(email, passwordHash, fullName, phone, address, idProof, drivingLicense);
 
-    std::string token = generateSessionToken(customer->getId(), customer->getEmail());
+    std::string token = generateSessionToken();
+
+    auto now = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
 
     SessionInfo session;
     session.userId = customer->getId();
@@ -46,7 +43,8 @@ std::string AuthenticationService::registerCustomer(
     session.role = "customer";
     session.customerOrAdminId = customer->getCustomerId();
     session.fullName = customer->getFullName();
-    session.loginTime = std::chrono::system_clock::now().time_since_epoch().count();
+    session.loginTime = now;
+    session.expiresAt = now + SESSION_TTL_SECONDS;
 
     {
         std::lock_guard<std::mutex> lock(m_sessionMutex);
@@ -70,13 +68,18 @@ std::pair<std::string, SessionInfo> AuthenticationService::login(const std::stri
         throw AuthenticationException("Invalid email or password.");
     }
 
-    std::string token = generateSessionToken(user->getId(), user->getEmail());
+    std::string token = generateSessionToken();
+
+    auto now = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
 
     SessionInfo session;
     session.userId = user->getId();
     session.email = user->getEmail();
     session.role = user->getRole();
-    session.loginTime = std::chrono::system_clock::now().time_since_epoch().count();
+    session.loginTime = now;
+    session.expiresAt = now + SESSION_TTL_SECONDS;
 
     if (user->getRole() == "customer") {
         auto cust = m_userRepo.findCustomerByUserId(user->getId());
@@ -107,10 +110,36 @@ void AuthenticationService::logout(const std::string& token) {
     Logger::info("User session logged out.");
 }
 
+void AuthenticationService::purgeExpiredSessions() {
+    auto now = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+
+    std::lock_guard<std::mutex> lock(m_sessionMutex);
+    for (auto it = m_activeSessions.begin(); it != m_activeSessions.end();) {
+        if (now > it->second.expiresAt) {
+            it = m_activeSessions.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
 bool AuthenticationService::validateSession(const std::string& token, SessionInfo& outSession) const {
+    if (token.empty()) return false;
+
     std::lock_guard<std::mutex> lock(m_sessionMutex);
     auto it = m_activeSessions.find(token);
     if (it != m_activeSessions.end()) {
+        auto now = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+        ).count();
+
+        // Enforce 24-hour expiration TTL
+        if (now > it->second.expiresAt) {
+            return false;
+        }
+
         outSession = it->second;
         return true;
     }
@@ -146,6 +175,6 @@ bool AuthenticationService::changePassword(int userId, const std::string& oldPas
         throw AuthenticationException("Incorrect current password.");
     }
 
-    std::string newHash = PasswordHasher::sha256(newPassword);
+    std::string newHash = PasswordHasher::hashPassword(newPassword);
     return m_userRepo.updatePassword(userId, newHash);
 }

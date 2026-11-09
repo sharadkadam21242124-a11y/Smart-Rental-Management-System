@@ -44,8 +44,8 @@
     <div class="container position-relative" style="z-index: 2;">
       <div class="row align-items-center py-4">
         <div class="col-lg-7">
-          <span class="badge bg-primary bg-opacity-25 text-info px-3 py-2 rounded-pill mb-3 font-monospace">
-            <i class="fa-solid fa-shield-halved me-1"></i> Powered by C++17 OOP & MySQL 8.0
+          <span class="badge bg-primary bg-opacity-25 text-info px-3 py-2 rounded-pill mb-3 fw-semibold">
+            <i class="fa-solid fa-certificate me-1"></i> Verified Premium Rentals & Instant Booking
           </span>
           <h1 class="hero-title mb-3">Rent Cars, Bikes, Homes & Furniture Seamlessly</h1>
           <p class="hero-subtitle mb-4">
@@ -127,7 +127,7 @@
         <!-- Loaded via C++ API -->
         <div class="col-12 text-center py-5">
           <div class="spinner-border text-primary" role="status"></div>
-          <p class="text-muted mt-2">Loading featured items from C++ backend...</p>
+          <p class="text-muted mt-2">Loading featured rental items...</p>
         </div>
       </div>
     </div>
@@ -152,14 +152,14 @@
           <div class="p-3">
             <div class="brand-icon mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">2</div>
             <h5 class="fw-bold">Pick Your Dates</h5>
-            <p class="text-muted small">Our C++ backend checks availability and applies tiered duration discounts.</p>
+            <p class="text-muted small">Real-time availability check with automatic tiered duration savings.</p>
           </div>
         </div>
         <div class="col-md-3">
           <div class="p-3">
             <div class="brand-icon mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">3</div>
-            <h5 class="fw-bold">Confirm & Pay Demo</h5>
-            <p class="text-muted small">Instant booking code generated with demo UPI, Card or Cash payment receipts.</p>
+            <h5 class="fw-bold">Confirm & Reserve</h5>
+            <p class="text-muted small">Instant booking confirmation with transparent payment and digital invoice receipts.</p>
           </div>
         </div>
         <div class="col-md-3">
@@ -173,46 +173,72 @@
     </div>
   </section>
 
-  <!-- Benefits Section -->
-  <section class="py-5 bg-light">
+  <!-- Why Choose Smart Rental -->
+  <section class="py-5 bg-white border-top">
     <div class="container">
-      <div class="row align-items-center">
+      <div class="row align-items-center g-5">
         <div class="col-lg-6">
-          <span class="text-primary fw-semibold text-uppercase">Why Choose Us</span>
-          <h2 class="fw-bold mb-4">Enterprise-Grade Object-Oriented Engineering</h2>
-          <div class="d-flex gap-3 mb-3">
-            <div class="text-primary fs-4"><i class="fa-solid fa-circle-check"></i></div>
+          <span class="text-primary fw-semibold text-uppercase tracking-wider">The Smart Rental Difference</span>
+          <h2 class="fw-bold mb-3 text-navy">Rent With Complete Peace of Mind</h2>
+          <p class="text-muted mb-4">
+            Whether you need a reliable car for a road trip, a sports bike for the weekend, a furnished city apartment, or home essentials, Smart Rental provides verified quality, transparent pricing, and trusted service across India.
+          </p>
+
+          <div class="d-flex gap-3 mb-4">
+            <div class="stat-icon stat-icon-blue flex-shrink-0"><i class="fa-solid fa-shield-check"></i></div>
             <div>
-              <h6 class="fw-bold mb-1">Polymorphic Rent & Discount Engine</h6>
-              <p class="text-muted small">Each rental category calculates pricing dynamically via C++ virtual methods, including automatic 5% to 25% duration discounts.</p>
+              <h6 class="fw-bold mb-1">100% Verified Quality & Safety Inspections</h6>
+              <p class="text-muted small mb-0">Every vehicle, property, and furniture item undergoes rigorous multi-point mechanical and cleanliness certification before handover.</p>
             </div>
           </div>
-          <div class="d-flex gap-3 mb-3">
-            <div class="text-primary fs-4"><i class="fa-solid fa-circle-check"></i></div>
+
+          <div class="d-flex gap-3 mb-4">
+            <div class="stat-icon stat-icon-emerald flex-shrink-0"><i class="fa-solid fa-tags"></i></div>
             <div>
-              <h6 class="fw-bold mb-1">Double-Booking Collision Prevention</h6>
-              <p class="text-muted small">ACID-compliant MySQL transactions and schedule conflict checks prevent overlapping bookings.</p>
+              <h6 class="fw-bold mb-1">Best-Rate Guarantee & Long-Term Discounts</h6>
+              <p class="text-muted small mb-0">Enjoy transparent daily rates with automatic tiered discounts up to 25% for weekly and monthly bookings—no hidden convenience fees.</p>
             </div>
           </div>
-          <div class="d-flex gap-3 mb-3">
-            <div class="text-primary fs-4"><i class="fa-solid fa-circle-check"></i></div>
+
+          <div class="d-flex gap-3">
+            <div class="stat-icon stat-icon-amber flex-shrink-0"><i class="fa-solid fa-hand-holding-dollar"></i></div>
             <div>
-              <h6 class="fw-bold mb-1">Audited Financial Settlement</h6>
-              <p class="text-muted small">Differentiates true earned rental revenue from refundable customer security deposits.</p>
+              <h6 class="fw-bold mb-1">Guaranteed Refundable Security Deposit</h6>
+              <p class="text-muted small mb-0">Zero hassle return audits. Your security deposit is held safely in escrow and refunded immediately upon item return check-in.</p>
             </div>
           </div>
         </div>
+
         <div class="col-lg-6">
-          <div class="custom-card p-4 bg-white shadow-md">
-            <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-code me-2 text-primary"></i>Tech Stack Summary</h5>
-            <ul class="list-group list-group-flush small">
-              <li class="list-group-item d-flex justify-content-between"><span>Backend Language</span><strong class="text-primary">C++17</strong></li>
-              <li class="list-group-item d-flex justify-content-between"><span>HTTP Server</span><strong>cpp-httplib</strong></li>
-              <li class="list-group-item d-flex justify-content-between"><span>Relational Database</span><strong class="text-success">MySQL 8.0 (InnoDB)</strong></li>
-              <li class="list-group-item d-flex justify-content-between"><span>Database GUI</span><strong>MySQL Workbench 8.0</strong></li>
-              <li class="list-group-item d-flex justify-content-between"><span>Frontend Engine</span><strong>HTML5, CSS3, JavaScript ES6</strong></li>
-              <li class="list-group-item d-flex justify-content-between"><span>Design System</span><strong>Bootstrap 5 & Chart.js</strong></li>
-            </ul>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="custom-card p-4 h-100 bg-light border-0 shadow-sm text-center">
+                <div class="stat-icon stat-icon-blue mx-auto mb-3"><i class="fa-solid fa-headset"></i></div>
+                <h5 class="fw-bold text-navy mb-1">24/7 Assistance</h5>
+                <p class="text-muted small mb-0">Round-the-clock roadside assistance, concierge desk, and emergency helpline across all major metro corridors.</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="custom-card p-4 h-100 bg-light border-0 shadow-sm text-center">
+                <div class="stat-icon stat-icon-emerald mx-auto mb-3"><i class="fa-solid fa-bolt"></i></div>
+                <h5 class="fw-bold text-navy mb-1">Instant Confirmation</h5>
+                <p class="text-muted small mb-0">Zero waiting periods. Confirmed bookings with real-time digital reservation pass and item dispatch scheduling.</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="custom-card p-4 h-100 bg-light border-0 shadow-sm text-center">
+                <div class="stat-icon stat-icon-amber mx-auto mb-3"><i class="fa-solid fa-calendar-check"></i></div>
+                <h5 class="fw-bold text-navy mb-1">Flexible Extensions</h5>
+                <p class="text-muted small mb-0">Extend your ongoing rental seamlessly online through your customer portal without penalty or paperwork.</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="custom-card p-4 h-100 bg-light border-0 shadow-sm text-center">
+                <div class="stat-icon stat-icon-rose mx-auto mb-3"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                <h5 class="fw-bold text-navy mb-1">Tax Invoicing</h5>
+                <p class="text-muted small mb-0">Compliant GST business billing, itemized invoices, and instant digital receipts for personal and corporate expenses.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -27,11 +27,27 @@ void PaymentController::registerRoutes(httplib::Server& svr) {
             if (type.empty()) type = "Rental Payment";
             if (remarks.empty()) remarks = "Demo payment processed successfully";
 
+            // Verify booking ownership for customer role
+            auto booking = m_billingService.getBookingById(bookingId);
+            if (!booking) {
+                sendError(res, 404, "Booking not found with ID: " + std::to_string(bookingId));
+                return;
+            }
+
             int custId = session.customerOrAdminId;
+            if (session.role != "admin" && booking->getCustomerId() != custId) {
+                sendError(res, 403, "Access denied: You can only make payments for your own bookings.");
+                return;
+            }
+
+            if (session.role == "admin") {
+                custId = booking->getCustomerId();
+            }
+
             auto payment = m_payService.processDemoPayment(bookingId, custId, amount, method, type, remarks);
 
             std::ostringstream ss;
-            ss << "{\"success\":true,\"message\":\"Demo payment recorded successfully!\",\"payment\":"
+            ss << "{\"success\":true,\"message\":\"Demo payment recorded successfully!\",\"is_demo_gateway\":true,\"payment\":"
                << payment->toJson() << "}";
             sendJson(res, 201, ss.str());
         } catch (const ValidationException& e) {
@@ -67,11 +83,28 @@ void PaymentController::registerRoutes(httplib::Server& svr) {
         sendJson(res, 200, ss.str());
     });
 
-    // GET /api/invoices/:booking_id
+    // GET /api/invoices/:booking_id (Secure Customer & Admin access)
     svr.Get(R"(/api/invoices/(\d+))", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string token = extractToken(req);
+        SessionInfo session;
+        if (!m_authService.validateSession(token, session)) {
+            sendError(res, 401, "Please log in to view invoices.");
+            return;
+        }
+
         try {
             int bookingId = std::stoi(req.matches[1]);
             auto invoice = m_billingService.getInvoiceByBookingId(bookingId);
+
+            // Authorization: Customers can only view invoices for their own bookings
+            if (session.role != "admin") {
+                auto booking = m_billingService.getBookingById(bookingId);
+                if (booking && booking->getCustomerId() != session.customerOrAdminId) {
+                    sendError(res, 403, "Access denied: You are not authorized to view this invoice.");
+                    return;
+                }
+            }
+
             sendJson(res, 200, "{\"success\":true,\"invoice\":" + invoice->toJson() + "}");
         } catch (const NotFoundException& e) {
             sendError(res, 404, e.what());

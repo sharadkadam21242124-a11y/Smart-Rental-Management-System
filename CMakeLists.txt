@@ -79,7 +79,7 @@ add_executable(SmartRentalManagement ${SOURCES})
 # Windows Socket & Cryptography dependencies for cpp-httplib
 if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
-    target_link_libraries(SmartRentalManagement PRIVATE ws2_32 crypt32)
+    target_link_libraries(SmartRentalManagement PRIVATE ws2_32 crypt32 bcrypt)
 endif()
 
 if (MYSQL_FOUND_CUSTOM)
@@ -112,6 +112,6 @@ set(TEST_SOURCES
 
 add_executable(run_tests ${TEST_SOURCES})
 if (WIN32)
-    target_link_libraries(run_tests PRIVATE ws2_32 crypt32)
+    target_link_libraries(run_tests PRIVATE ws2_32 crypt32 bcrypt)
 endif()
 target_link_libraries(run_tests PRIVATE Threads::Threads)

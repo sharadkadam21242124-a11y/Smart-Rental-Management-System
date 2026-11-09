@@ -113,6 +113,14 @@ int main(int argc, char* argv[]) {
         }
         Logger::info("Mounted static frontend web assets from: " + frontendDir);
 
+        // Wildcard CORS pre-flight handler
+        g_server->Options(R"(.*)", [](const httplib::Request&, httplib::Response& res) {
+            res.status = 204;
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        });
+
         // Root redirect to index.html
         g_server->Get("/", [](const httplib::Request&, httplib::Response& res) {
             res.set_redirect("/index.html");

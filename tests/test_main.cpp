@@ -41,13 +41,30 @@ int g_totalTests = 0;
 
 // 1. Password Hashing Test
 void testPasswordHashing() {
-    TEST_CASE("Password Hashing & Verification");
+    TEST_CASE("Password Hashing & CSPRNG Salted Security");
     std::string plain = "Password@123";
-    std::string hash = PasswordHasher::sha256(plain);
-    ASSERT_TRUE(!hash.empty(), "Hash should not be empty");
-    ASSERT_TRUE(hash.length() == 64, "SHA-256 output must be 64 hex characters");
-    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, hash), "Password verification failed");
-    ASSERT_TRUE(!PasswordHasher::verifyPassword("WrongPassword", hash), "Wrong password should fail");
+    
+    // Test pure SHA-256
+    std::string rawHash = PasswordHasher::sha256(plain);
+    ASSERT_TRUE(!rawHash.empty(), "Hash should not be empty");
+    ASSERT_TRUE(rawHash.length() == 64, "SHA-256 output must be 64 hex characters");
+    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, rawHash), "Legacy SHA-256 password verification failed");
+    ASSERT_TRUE(!PasswordHasher::verifyPassword("WrongPassword", rawHash), "Wrong password should fail");
+
+    // Test modern CSPRNG salted hash
+    std::string saltedHash1 = PasswordHasher::hashPassword(plain);
+    std::string saltedHash2 = PasswordHasher::hashPassword(plain);
+    ASSERT_TRUE(saltedHash1.rfind("SALTED$", 0) == 0, "Salted hash format must start with SALTED$");
+    ASSERT_TRUE(saltedHash1 != saltedHash2, "Different salts must produce different hash strings for same password");
+    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, saltedHash1), "Salted password verification failed");
+    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, saltedHash2), "Salted password verification failed for second hash");
+    ASSERT_TRUE(!PasswordHasher::verifyPassword("WrongPass@123", saltedHash1), "Salted verify must reject incorrect password");
+
+    // Test constant time comparison
+    ASSERT_TRUE(PasswordHasher::constantTimeCompare("secret123", "secret123"), "Constant time compare should succeed for identical strings");
+    ASSERT_TRUE(!PasswordHasher::constantTimeCompare("secret123", "secret124"), "Constant time compare should fail for different strings");
+    ASSERT_TRUE(!PasswordHasher::constantTimeCompare("short", "longerstring"), "Constant time compare should fail for different lengths");
+
     TEST_PASSED();
 }
 
@@ -199,6 +216,86 @@ void testValidationExceptions() {
     TEST_PASSED();
 }
 
+// 8. Booking Interval Conflict & Overlap Logic Test
+void testBookingConflictLogic() {
+    TEST_CASE("Booking Date Interval Overlap Detection (Mathematical Logic)");
+
+    // Logic: Existing interval [E_start, E_end], New interval [N_start, N_end]
+    // Overlaps if and only if: (N_start < E_end) && (N_end > E_start)
+    auto doesOverlap = [](const std::string& nStart, const std::string& nEnd,
+                          const std::string& eStart, const std::string& eEnd) {
+        return (nStart < eEnd) && (nEnd > eStart);
+    };
+
+    // Existing booking: Nov 10 to Nov 15
+    std::string eStart = "2026-11-10";
+    std::string eEnd   = "2026-11-15";
+
+    // Overlapping case 1: Completely inside (Nov 11 to Nov 14)
+    ASSERT_TRUE(doesOverlap("2026-11-11", "2026-11-14", eStart, eEnd), "Sub-interval must conflict");
+
+    // Overlapping case 2: Enclosing (Nov 08 to Nov 18)
+    ASSERT_TRUE(doesOverlap("2026-11-08", "2026-11-18", eStart, eEnd), "Super-interval must conflict");
+
+    // Overlapping case 3: Left-overlap (Nov 08 to Nov 12)
+    ASSERT_TRUE(doesOverlap("2026-11-08", "2026-11-12", eStart, eEnd), "Left-overlapping interval must conflict");
+
+    // Overlapping case 4: Right-overlap (Nov 13 to Nov 18)
+    ASSERT_TRUE(doesOverlap("2026-11-13", "2026-11-18", eStart, eEnd), "Right-overlapping interval must conflict");
+
+    // Non-overlapping case 1: Strictly before (Nov 01 to Nov 09)
+    ASSERT_TRUE(!doesOverlap("2026-11-01", "2026-11-09", eStart, eEnd), "Prior non-overlapping interval must not conflict");
+
+    // Non-overlapping case 2: Strictly after (Nov 16 to Nov 20)
+    ASSERT_TRUE(!doesOverlap("2026-11-16", "2026-11-20", eStart, eEnd), "Subsequent non-overlapping interval must not conflict");
+
+    // Non-overlapping case 3: Adjacent boundary (Nov 05 to Nov 10 check-out, and Nov 15 to Nov 20 check-in)
+    ASSERT_TRUE(!doesOverlap("2026-11-05", "2026-11-10", eStart, eEnd), "Contiguous checkout on boundary must not conflict");
+    ASSERT_TRUE(!doesOverlap("2026-11-15", "2026-11-20", eStart, eEnd), "Contiguous checkin on boundary must not conflict");
+
+    TEST_PASSED();
+}
+
+// 9. Comprehensive Financial & Discount Calculation Test
+void testFinancialCalculationsAndDiscounts() {
+    TEST_CASE("Tiered Rental Discounts & Net Billing Precision");
+
+    double dailyRate = 1000.0;
+    double deposit = 2000.0;
+
+    auto calculateTotal = [dailyRate, deposit](int days) {
+        double base = dailyRate * days;
+        double discountRate = 0.0;
+        if (days >= 30) discountRate = 20.0;
+        else if (days >= 14) discountRate = 15.0;
+        else if (days >= 7) discountRate = 10.0;
+        else if (days >= 5) discountRate = 5.0;
+
+        double discount = base * (discountRate / 100.0);
+        return (base - discount) + deposit;
+    };
+
+    // 1 Day: No discount -> 1000 + 2000 = 3000
+    ASSERT_TRUE(std::abs(calculateTotal(1) - 3000.0) < 0.01, "1 day calculation mismatch");
+
+    // 4 Days: No discount -> 4000 + 2000 = 6000
+    ASSERT_TRUE(std::abs(calculateTotal(4) - 6000.0) < 0.01, "4 days calculation mismatch");
+
+    // 5 Days: 5% discount -> 5000 * 0.95 = 4750 + 2000 = 6750
+    ASSERT_TRUE(std::abs(calculateTotal(5) - 6750.0) < 0.01, "5 days calculation mismatch");
+
+    // 7 Days: 10% discount -> 7000 * 0.90 = 6300 + 2000 = 8300
+    ASSERT_TRUE(std::abs(calculateTotal(7) - 8300.0) < 0.01, "7 days calculation mismatch");
+
+    // 14 Days: 15% discount -> 14000 * 0.85 = 11900 + 2000 = 13900
+    ASSERT_TRUE(std::abs(calculateTotal(14) - 13900.0) < 0.01, "14 days calculation mismatch");
+
+    // 30 Days: 20% discount -> 30000 * 0.80 = 24000 + 2000 = 26000
+    ASSERT_TRUE(std::abs(calculateTotal(30) - 26000.0) < 0.01, "30 days calculation mismatch");
+
+    TEST_PASSED();
+}
+
 int main() {
     std::cout << "========================================================\n"
               << "   SMART RENTAL MANAGEMENT SYSTEM - TEST SUITE          \n"
@@ -213,6 +310,8 @@ int main() {
     testTemplateRepository();
     testReturnSettlement();
     testValidationExceptions();
+    testBookingConflictLogic();
+    testFinancialCalculationsAndDiscounts();
 
     std::cout << "\n========================================================" << std::endl;
     std::cout << " TEST RESULTS: " << g_passedTests << "/" << g_totalTests

@@ -164,9 +164,9 @@ bool Database::connect() {
     Logger::info("Connected to MySQL Server 8.0 [" + m_config.database + "@" + m_config.host + "]");
     return true;
 #else
-    m_connected = true;
-    Logger::info("Database initialized (Internal Standalone Engine active for " + m_config.database + ")");
-    return true;
+    m_connected = false;
+    Logger::error("Fatal Database Configuration: USE_MYSQL_CLIENT is not defined. MySQL 8.0 client library is strictly required.");
+    throw DatabaseException("Fatal: Only genuine MySQL 8.0 database engine is supported.");
 #endif
 }
 
@@ -256,7 +256,7 @@ int Database::executeUpdate(const std::string& sql) {
     }
     return static_cast<int>(mysql_affected_rows(static_cast<MYSQL*>(m_mysqlHandle)));
 #else
-    return 1;
+    throw DatabaseException("Cannot execute SQL update: MySQL 8.0 client is not enabled.");
 #endif
 }
 

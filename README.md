@@ -366,9 +366,12 @@ See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for payload schemas a
 
 ## Security Features
 
-- **No Plaintext Passwords:** Secure cryptographic hashing using SHA-256 with salt support.
-- **SQL Injection Prevention:** All SQL queries utilize prepared statements and input sanitization (`mysql_real_escape_string`).
-- **Role-Based Access Control (RBAC):** Admin endpoints are protected by token validation; unauthorized customer access returns HTTP 403.
-- **Session Protection:** Tokens are cryptographically tied to user IDs and invalidated upon logout.
-- **Audit Trails:** Critical administrative actions and financial transactions are recorded in the `activity_logs` table.
-- **Git Safety:** Credentials and sensitive files are strictly excluded via `.gitignore`.
+- **CSPRNG Salted Password Hashing:** Passwords hashed with cryptographically generated salts via Windows CNG (`BCryptGenRandom`) using constant-time comparison to prevent timing side-channel attacks, with seamless legacy migration.
+- **256-Bit Cryptographic Session Tokens:** Unpredictable CSPRNG session tokens generated using system entropy (`SRMS-<64-char-hex>`).
+- **Session Expiration & Invalidation:** Strict 24-hour TTL expiration enforced on every protected route with active session invalidation upon logout.
+- **ACID Double-Booking Prevention:** Concurrency-safe MySQL transactions with row-level locks (`SELECT ... FOR UPDATE`) on inventory and booking records to prevent simultaneous reservation collisions.
+- **Strict Endpoint Authorization & IDOR Protection:** Customer ownership checks on invoices (`/api/invoices/:id`) and payments (`/api/payments`), preventing cross-customer data exposure.
+- **CORS & XSS Sanitization:** Wildcard OPTIONS preflight handling and centralized DOM sanitization (`escapeHtml`) on dynamic user inputs.
+- **SQL Injection Prevention:** All SQL queries utilize prepared statements and escaping (`mysql_real_escape_string`).
+- **Role-Based Access Control (RBAC):** Admin endpoints strictly gated; unauthorized customer attempts receive HTTP 403 Forbidden.
+- **Credential Hygiene:** Credentials and private configurations excluded from version control via `.gitignore`.

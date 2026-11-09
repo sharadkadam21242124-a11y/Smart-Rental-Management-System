@@ -14,8 +14,8 @@ bool BookingRepository::isItemAvailableForDates(int itemId, const std::string& s
     ss << "SELECT COUNT(*) AS conflict_count FROM bookings "
        << "WHERE item_id = " << itemId << " "
        << "AND booking_status IN ('confirmed', 'active') "
-       << "AND NOT (end_date < '" << m_db.escapeString(startDate) << "' "
-       << "OR start_date > '" << m_db.escapeString(endDate) << "')";
+       << "AND (start_date < '" << m_db.escapeString(endDate) << "' "
+       << "AND end_date > '" << m_db.escapeString(startDate) << "')";
 
     if (excludeBookingId > 0) {
         ss << " AND id != " << excludeBookingId;
@@ -31,13 +31,32 @@ std::shared_ptr<Booking> BookingRepository::createBooking(int customerId, int it
                                                         const std::string& startDate,
                                                         const std::string& endDate) {
     if (startDate >= endDate) {
-        throw ValidationException("Booking start date must be before end date.");
+        throw ValidationException("Booking start date must be strictly before end date.");
     }
 
-    // Verify item exists
+    // Validate that start date is not in the past
+    std::ostringstream ssDateCheck;
+    ssDateCheck << "SELECT DATEDIFF('" << m_db.escapeString(startDate) << "', CURRENT_DATE()) AS diff_from_today, "
+                << "DATEDIFF('" << m_db.escapeString(endDate) << "', '" << m_db.escapeString(startDate) << "') AS rental_days;";
+    QueryResult dateRes = m_db.executeQuery(ssDateCheck.str());
+    if (!dateRes.empty()) {
+        int diffFromToday = dateRes[0].getInt("diff_from_today");
+        if (diffFromToday < 0) {
+            throw ValidationException("Booking start date cannot be in the past (" + startDate + ").");
+        }
+        int days = dateRes[0].getInt("rental_days");
+        if (days > 365) {
+            throw ValidationException("Booking duration cannot exceed 365 days.");
+        }
+    }
+
+    // BEGIN ACID TRANSACTION WITH ROW LOCKING TO PREVENT CONCURRENT DOUBLE BOOKINGS
+    TransactionGuard guard(m_db);
+
+    // 1. Lock inventory row with FOR UPDATE
     std::ostringstream ssItem;
     ssItem << "SELECT id, title, category, daily_rate, security_deposit, status "
-           << "FROM rental_items WHERE id = " << itemId << " LIMIT 1;";
+           << "FROM rental_items WHERE id = " << itemId << " FOR UPDATE;";
     QueryResult itemRes = m_db.executeQuery(ssItem.str());
     if (itemRes.empty()) {
         throw NotFoundException("Rental item not found with ID: " + std::to_string(itemId));
@@ -48,17 +67,21 @@ std::shared_ptr<Booking> BookingRepository::createBooking(int customerId, int it
         throw ValidationException("Rental item is currently under " + itemRow.getString("status") + " and cannot be booked.");
     }
 
-    // Overlapping booking prevention
-    if (!isItemAvailableForDates(itemId, startDate, endDate)) {
+    // 2. Lock and check overlapping active bookings with FOR UPDATE
+    std::ostringstream ssConflict;
+    ssConflict << "SELECT COUNT(*) AS conflict_count FROM bookings "
+               << "WHERE item_id = " << itemId << " "
+               << "AND booking_status IN ('confirmed', 'active') "
+               << "AND (start_date < '" << m_db.escapeString(endDate) << "' "
+               << "AND end_date > '" << m_db.escapeString(startDate) << "') FOR UPDATE;";
+    QueryResult confRes = m_db.executeQuery(ssConflict.str());
+    int conflictCount = confRes.empty() ? 0 : confRes[0].getInt("conflict_count");
+    if (conflictCount > 0) {
         throw BookingConflictException("The selected item is already booked for these dates. Please choose different dates.");
     }
 
-    // Calculate rental days using MySQL DATEDIFF
-    std::ostringstream ssDiff;
-    ssDiff << "SELECT DATEDIFF('" << m_db.escapeString(endDate) << "', '"
-           << m_db.escapeString(startDate) << "') AS days;";
-    QueryResult diffRes = m_db.executeQuery(ssDiff.str());
-    int days = diffRes.empty() ? 1 : diffRes[0].getInt("days");
+    // Calculate rental days
+    int days = dateRes.empty() ? 1 : dateRes[0].getInt("rental_days");
     if (days < 1) days = 1;
 
     double dailyRate = itemRow.getDouble("daily_rate");
@@ -83,8 +106,6 @@ std::shared_ptr<Booking> BookingRepository::createBooking(int customerId, int it
     std::ostringstream ssCode;
     ssCode << "BK-2026-" << (now % 100000) << dis(gen);
     std::string bookingCode = ssCode.str();
-
-    TransactionGuard guard(m_db);
 
     std::ostringstream ssIns;
     ssIns << "INSERT INTO bookings (booking_code, customer_id, item_id, start_date, end_date, rental_days, "

@@ -26,6 +26,7 @@ public:
     static BillEstimate estimateBill(double dailyRate, int days, double deposit);
     std::shared_ptr<Invoice> generateInvoice(int bookingId);
     std::shared_ptr<Invoice> getInvoiceByBookingId(int bookingId);
+    std::shared_ptr<Booking> getBookingById(int bookingId);
 };
 
 #endif // BILLING_SERVICE_H

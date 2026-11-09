@@ -113,8 +113,19 @@ const Auth = {
 };
 
 // ----------------------------------------------------------------------------
-// Formatting Helpers
+// Formatting & Security Sanitization Helpers
 // ----------------------------------------------------------------------------
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+window.escapeHtml = escapeHtml;
+
 function formatCurrency(amount) {
   const num = Number(amount) || 0;
   return '₹' + num.toLocaleString('en-IN', {
@@ -190,7 +201,7 @@ function updateNavbar() {
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
           <i class="fa-solid ${isAdm ? 'fa-user-shield' : 'fa-user-circle'} text-info"></i>
-          <span>${user.full_name || user.name || user.email}</span>
+          <span>${escapeHtml(user.full_name || user.name || user.email)}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
           <li><span class="dropdown-item-text text-muted small">${isAdm ? 'Administrator' : 'Customer Account'}</span></li>

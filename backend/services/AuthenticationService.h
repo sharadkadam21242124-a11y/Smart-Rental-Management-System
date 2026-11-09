@@ -13,14 +13,16 @@ struct SessionInfo {
     std::string role;
     int customerOrAdminId;
     std::string fullName;
-    long long loginTime;
+    long long loginTime; // Epoch seconds
+    long long expiresAt; // Epoch seconds (loginTime + TTL)
 };
 
 /**
  * ============================================================================
  * OOP CONCEPT: Service Layer Pattern & Session Security
  * AuthenticationService manages login authentication, secure registration,
- * session token generation, role verification, and logout session teardown.
+ * CSPRNG session token generation, role verification, session TTL expiration,
+ * and logout session teardown.
  * ============================================================================
  */
 class AuthenticationService {
@@ -28,6 +30,8 @@ private:
     UserRepository& m_userRepo;
     std::map<std::string, SessionInfo> m_activeSessions;
     mutable std::mutex m_sessionMutex;
+
+    static constexpr long long SESSION_TTL_SECONDS = 86400; // 24-hour expiration
 
 public:
     explicit AuthenticationService(UserRepository& repo);
@@ -45,6 +49,7 @@ public:
 
     std::pair<std::string, SessionInfo> login(const std::string& email, const std::string& password);
     void logout(const std::string& token);
+    void purgeExpiredSessions();
 
     bool updateProfile(int userId, const std::string& role, int accountId,
                        const std::string& fullName, const std::string& phone,
@@ -55,8 +60,8 @@ public:
     bool validateSession(const std::string& token, SessionInfo& outSession) const;
     bool requireRole(const std::string& token, const std::string& requiredRole, SessionInfo& outSession) const;
 
-    // Helper token generator
-    static std::string generateSessionToken(int userId, const std::string& email);
+    // Cryptographically Secure Pseudo-Random Token Generator
+    static std::string generateSessionToken();
 };
 
 #endif // AUTHENTICATION_SERVICE_H

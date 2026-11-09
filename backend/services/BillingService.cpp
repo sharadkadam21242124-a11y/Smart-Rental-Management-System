@@ -34,3 +34,7 @@ std::shared_ptr<Invoice> BillingService::getInvoiceByBookingId(int bookingId) {
     }
     return inv;
 }
+
+std::shared_ptr<Booking> BillingService::getBookingById(int bookingId) {
+    return m_bookingRepo.findById(bookingId);
+}

@@ -1,377 +1,807 @@
 # Smart Rental Management System
-## Advanced Academic C++17 & MySQL 8.0 Full-Stack Application
+
+### A Full-Stack Multi-Category Rental & Inventory Management Platform
 
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
-[![MySQL 8.0](https://img.shields.io/badge/MySQL-8.0_InnoDB-4479A1?logo=mysql)](https://www.mysql.com/)
-[![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap)](https://getbootstrap.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0_InnoDB-4479A1?logo=mysql)](https://www.mysql.com/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap)](https://getbootstrap.com/)
 [![Chart.js](https://img.shields.io/badge/Chart.js-4.4-FF6384?logo=chartdotjs)](https://www.chartjs.org/)
 [![CMake](https://img.shields.io/badge/CMake-3.15%2B-064F8C?logo=cmake)](https://cmake.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-An enterprise-grade, multi-category rental management platform engineered with modern **C++17**, a high-performance REST server (`cpp-httplib`), **MySQL 8.0** with ACID transaction safety, and a responsive frontend web interface across **28 dedicated pages**.
+A full-stack rental and inventory management platform engineered using modern **C++17**, featuring an embedded multi-threaded HTTP REST server (`cpp-httplib`), **MySQL 8.0 with InnoDB**, and a responsive web application comprising 28 dedicated interface pages.
 
-Designed and implemented as an academic capstone and OOP viva defense project for a Second-Year Computer Engineering student, demonstrating all **29 Object-Oriented Programming (OOP) concepts** with working software architecture.
+The system unifies multi-domain rental operations — spanning automotive vehicles, motorcycles, residential properties, and office furniture — into a single platform with booking scheduling, itemized invoicing, return inspection settlements, role-based access control, and administrative analytics.
 
 ---
 
 ## Table of Contents
 
+- [Project Overview](#project-overview)
 - [Key Features](#key-features)
+- [Supported Rental Categories](#supported-rental-categories)
+- [Technology Stack](#technology-stack)
 - [System Architecture](#system-architecture)
-- [Project Directory Structure](#project-directory-structure)
-- [28 Responsive Web Pages](#28-responsive-web-pages)
-- [Database Design & Setup](#database-design--setup)
-- [Building from Source](#building-from-source)
-- [Running the Application](#running-the-application)
-- [Automated OOP Test Suite](#automated-oop-test-suite)
-- [Verified Demo Credentials](#verified-demo-credentials)
-- [29 OOP Concepts viva Reference](#29-oop-concepts-viva-reference)
-- [REST API Endpoints Reference](#rest-api-endpoints-reference)
-- [Security Features](#security-features)
+- [Application Workflow](#application-workflow)
+- [Screenshots and Visual Interface Tour](#screenshots-and-visual-interface-tour)
+- [Database Design](#database-design)
+- [Security Implementation](#security-implementation)
+- [Testing and Verification](#testing-and-verification)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation and Setup](#installation-and-setup)
+- [Database Configuration](#database-configuration)
+- [Build Instructions](#build-instructions)
+- [How to Run](#how-to-run)
+- [Demo Credentials](#demo-credentials)
+- [API Documentation](#api-documentation)
+- [Known Limitations](#known-limitations)
+- [Future Improvements](#future-improvements)
+- [Learning Outcomes](#learning-outcomes)
+- [License](#license)
+
+---
+
+## Project Overview
+
+Many rental businesses operate across distinct product domains, such as fleet vehicles, event equipment, residential properties, and furniture. However, standard management software often isolates these domains into separate products.
+
+The **Smart Rental Management System** addresses this challenge by bringing multiple rental categories together under one platform. Its data architecture supports category-specific specifications while standardizing booking calendars, pricing calculations, itemized billing, and return settlements.
+
+### Why This Project Is Technically Interesting
+
+- **Native C++ Backend:** The core backend is built in C++17 rather than relying on managed runtime environments such as Node.js or Python. It demonstrates modern C++ concepts, smart pointers, RAII-based resource management, and direct integration with the MySQL C API.
+
+- **Embedded Web Server:** Uses `cpp-httplib` to serve JSON REST API endpoints and static frontend pages directly through the compiled application on port 8080.
+
+- **Concurrency-Safe Reservations:** Uses date-interval validation, database transactions, and thread synchronization to prevent overlapping reservations.
+
+- **Zero-Build Frontend:** Uses HTML5, CSS3, Vanilla JavaScript, and Bootstrap 5.3 without requiring a Node.js or npm compilation workflow.
+
+- **Relational Database Design:** Uses MySQL 8.0 with InnoDB, foreign keys, and transactional operations to maintain data consistency.
 
 ---
 
 ## Key Features
 
-- **4 Multi-Domain Rental Categories:**
-  - **Cars:** SUVs, sedans, luxury, and electric vehicles with fuel types, seating capacity, and transmission filters.
-  - **Bikes:** Cruisers, sports bikes, and commuter motorcycles with engine cc specifications.
-  - **Houses:** Luxury villas, apartments, and studios with bedroom, bathroom, and sq.ft details.
-  - **Furniture:** Living room sets, ergonomic executive desks, and premium sofas.
-- **Role-Based Portals:**
-  - **Customer Portal:** Browse catalog, dynamic date & rate calculation, live availability checks, book items, view itemized invoices, record simulated payments (Cash, UPI Demo, Card Demo), inspect booking history, update profile, and cancel eligible reservations.
-  - **Admin Console:** Fleet inventory CRUD, customer account enable/disable, booking management, return check-in with overdue/damage fee calculations, security deposit refunds, CSV exports, and Chart.js telemetry reports.
-- **Enterprise Financial Integrity:**
-  - Security deposits are tracked strictly as liabilities, separated from earned revenue.
-  - Transparent itemized bills displaying base rent, duration discounts, security deposits, and net balances.
-- **Pure C++17 Core Logic:**
-  - Standalone SHA-256 password hashing.
-  - RAII transaction protection (`TransactionGuard`) preventing orphaned states.
-  - Thread-safe connection pooling and prepared statements against MySQL 8.0.
+- **Dynamic Catalog and Filtering:** Search and filter rental items by category, daily rate, location, transmission, fuel type, engine capacity, square footage, and material dimensions.
+
+- **Mathematical Interval Scheduling:** Validates booking date windows against existing reservations using half-open interval overlap logic:
+
+  `start_date < existing_end AND end_date > existing_start`
+
+- **Concurrency-Safe Reservations:** Synchronizes reservation creation through an RAII `TransactionGuard` and mutex locks to prevent simultaneous double-booking collisions.
+
+- **Itemized Billing and Discounts:** Generates detailed billing statements with duration-based discounts and explicit separation of security deposit liabilities from rental charges.
+
+- **Simulated Payment Gateway:** Supports demonstration payments through Cash, UPI Demo, and Card Demo methods, generating transaction references and updating booking states.
+
+- **Return Inspection and Settlement:** Provides an administrative check-in workflow that calculates overdue days, late fees, damage deductions, and net security deposit refunds.
+
+- **Administrative Analytics:** Provides a dashboard with Chart.js visualizations for revenue and inventory distribution, along with CSV exports for revenue, bookings, and inventory.
+
+- **Role-Based Access Control:** Separates public browsing, customer self-service, and administrator operations through authorization checks.
+
+---
+
+## Supported Rental Categories
+
+The system models four rental domains, each with category-specific relational attributes.
+
+| Category | Primary Attributes | Domain-Specific Filters |
+|---|---|---|
+| Cars | Brand, model, year, fuel type, seating capacity, transmission, registration number, mileage | Transmission, fuel type, seating capacity |
+| Bikes | Brand, model, year, engine displacement, bike type, registration number, helmet included | Engine capacity, motorcycle type |
+| Houses | Property type, bedrooms, bathrooms, furnishing status, area, address, parking | BHK count, furnishing, property type |
+| Furniture | Furniture type, material, color, condition, dimensions, assembly requirement | Material, dimensions, assembly requirement |
+
+---
+
+## Technology Stack
+
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| C++17 | Core backend implementation |
+| `cpp-httplib` | Embedded HTTP server and REST API |
+| Custom `JsonHelper` | JSON serialization, deserialization, and string escaping |
+| Windows CNG API | Cryptographic random generation and PBKDF2 key derivation |
+| C++ Standard Library | Thread synchronization and resource management |
+
+### Database
+
+| Technology | Purpose |
+|---|---|
+| MySQL Server 8.0 | Relational database |
+| InnoDB | Storage engine, foreign keys, and transactions |
+| MySQL C API | Native database connectivity |
+| Prepared Statements | Parameterized SQL operations |
+
+### Frontend
+
+| Technology | Purpose |
+|---|---|
+| HTML5 | Page structure |
+| CSS3 | Responsive styling |
+| Vanilla JavaScript (ES6+) | Frontend logic and asynchronous API requests |
+| Bootstrap 5.3 | Responsive UI components |
+| Font Awesome 6 | Interface icons |
+| Chart.js 4.4 | Dashboard data visualization |
+
+### Build and Testing
+
+| Technology | Purpose |
+|---|---|
+| CMake 3.15+ | Build configuration |
+| Ninja or Make | Build generation |
+| GCC 11+ / MinGW-w64 | C++ compilation |
+| C++ Test Runner | Unit testing |
+| Python 3.8+ | Automated integration and E2E testing |
 
 ---
 
 ## System Architecture
 
+The application follows a layered architecture that separates HTTP handling, business logic, database operations, and frontend presentation.
+
+```text
+                  +---------------------------------------+
+                  |         Frontend Client                |
+                  | HTML5 / CSS3 / JavaScript / Chart.js   |
+                  +---------------------------------------+
+                                |
+                         REST API / JSON
+                                |
+                  +---------------------------------------+
+                  |          C++17 Backend                |
+                  |       cpp-httplib :8080               |
+                  +---------------------------------------+
+                                |
+             +------------------+------------------+
+             |                  |                  |
+       +-----------+      +-----------+      +-----------+
+       |  Auth API |      | Rental API|      | Booking API|
+       +-----------+      +-----------+      +-----------+
+                                |
+                  +---------------------------------------+
+                  |       Domain Services & Models       |
+                  | Billing / Availability / Returns     |
+                  +---------------------------------------+
+                                |
+                  +---------------------------------------+
+                  |           Repository Layer            |
+                  | SQL Statements / Transactions        |
+                  +---------------------------------------+
+                                |
+                  +---------------------------------------+
+                  |        MySQL 8.0 InnoDB               |
+                  |     Relational Database               |
+                  +---------------------------------------+
 ```
-                      +---------------------------------------+
-                      |      Frontend Client (28 Pages)       |
-                      |  HTML5 / CSS3 / JavaScript / Chart.js |
-                      +---------------------------------------+
-                                          |
-                               REST API via HTTP / JSON
-                                          |
-                      +---------------------------------------+
-                      |         C++17 Backend Server          |
-                      |          (cpp-httplib :8080)          |
-                      +---------------------------------------+
-                       /          |              |          \
-            +------------+  +------------+ +------------+ +------------+
-            | Auth API   |  | Rental API | | Booking API| | Admin API  |
-            +------------+  +------------+ +------------+ +------------+
-                       \          |              |          /
-                      +---------------------------------------+
-                      |      Domain Services & OOP Logic      |
-                      |  Polymorphism, Inheritance, Factory   |
-                      +---------------------------------------+
-                                          |
-                      +---------------------------------------+
-                      |        MySQL 8.0 InnoDB Database      |
-                      |      13 Tables, Foreign Keys, ACID    |
-                      +---------------------------------------+
-```
+
+### Architectural Principles
+
+1. **Layered Separation of Concerns:** Controllers handle HTTP requests and responses, domain services implement business rules, and repositories manage database operations.
+
+2. **RAII Resource Management:** The `TransactionGuard` class manages transaction completion and rollback behavior during database operations.
+
+3. **Decoupled Frontend:** Frontend pages communicate with `/api/` endpoints using asynchronous JavaScript `fetch()` requests.
+
+4. **Relational Integrity:** MySQL foreign keys and InnoDB transactions help maintain consistency across related records.
 
 ---
 
-## Project Directory Structure
+## Application Workflow
 
+The system provides separate workflows for customers and administrators.
+
+```text
+       CUSTOMER WORKFLOW                 ADMINISTRATOR WORKFLOW
+
+       Browse Catalog                    Review Dashboard
+             |                                  |
+       Filter Rental Items                Manage Inventory
+             |                                  |
+       Check Availability                 Manage Customers
+             |                                  |
+       Create Booking                     Review Reservations
+             |                                  |
+       Receive Invoice                    Inspect Returned Items
+             |                                  |
+       Simulate Payment                   Calculate Fees & Refunds
+             |                                  |
+       View Booking Details               Complete Settlement
 ```
-SmartRentalManagement/
-├── backend/
-│   ├── api/                  # REST Controllers & cpp-httplib headers
-│   │   ├── AuthController.cpp / .h
-│   │   ├── RentalController.cpp / .h
-│   │   ├── BookingController.cpp / .h
-│   │   ├── PaymentController.cpp / .h
-│   │   ├── AdminController.cpp / .h
-│   │   ├── ReportController.cpp / .h
-│   │   └── httplib.h
-│   ├── database/             # Database connection, repositories, RAII guards
-│   │   ├── Database.cpp / .h
-│   │   ├── UserRepository.cpp / .h
-│   │   ├── RentalRepository.cpp / .h
-│   │   ├── BookingRepository.cpp / .h
-│   │   ├── PaymentRepository.cpp / .h
-│   │   └── TemplateRepository.h
-│   ├── models/               # Domain OOP classes (User, Customer, RentalItem, etc.)
-│   ├── services/             # Core business services & billing computations
-│   ├── utils/                # Logger, PasswordHasher (SHA-256), Exceptions
-│   └── main.cpp              # Server entry point & static file routing
-├── config/
-│   └── database.example.json # Safe configuration template (placeholders only)
-├── database/
-│   ├── schema.sql            # 13 InnoDB tables, constraints, foreign keys
-│   ├── seed.sql              # 40 items, 10 customers, 2 admins, 8 sample bookings
-│   └── DATABASE_DESIGN.md    # ER diagram, schema specs, and design documentation
-├── docs/
-│   ├── OOP_CONCEPTS.md       # Complete mapping of 29 OOP concepts for viva defense
-│   └── API_DOCUMENTATION.md  # Detailed REST API endpoints reference
-├── frontend/
-│   ├── css/style.css         # Master navy & white theme stylesheet
-│   ├── js/api.js             # API client, token management, toasts, auth sync
-│   └── *.html                # 28 dedicated web pages
-├── tests/
-│   └── test_main.cpp         # Standalone unit test suite for OOP concepts
-└── CMakeLists.txt            # CMake build definition
-```
+
+### Customer Operations
+
+- Browse available rental categories.
+- Search and filter rental items.
+- Check availability for selected dates.
+- Create rental reservations.
+- View itemized invoices.
+- Make demonstration payments.
+- Review personal bookings and account information.
+
+### Administrator Operations
+
+- Monitor dashboard analytics.
+- Manage rental inventory.
+- Manage customer records.
+- Review and manage reservations.
+- Inspect returned rental items.
+- Calculate overdue and damage charges.
+- Process security deposit settlements.
+- Export administrative reports.
 
 ---
 
-## 28 Responsive Web Pages
+## Screenshots and Visual Interface Tour
 
-| Category | Page File | Description |
+The application provides responsive frontend views served through the embedded C++ HTTP server.
+
+The following table identifies important interfaces that can be demonstrated through screenshots.
+
+| Interface | Route / File | Description |
 |---|---|---|
-| **Public** | `index.html` | Homepage with hero section, category navigation, featured fleet, testimonials |
-| | `about.html` | Platform mission, engineering architecture, and leadership team |
-| | `contact.html` | Customer support, contact form, inquiry routing |
-| | `login.html` | Role-based authentication modal with quick demo credentials |
-| | `register.html` | Customer registration with client & server-side validation |
-| **Customer** | `customer-dashboard.html` | Real-time rental stats, active bookings table, expenditure summary |
-| | `categories.html` | Category selector covering Cars, Bikes, Houses, and Furniture |
-| | `cars.html` | Dedicated automobile fleet listing with transmission & fuel filters |
-| | `bikes.html` | Two-wheeler catalog with engine cc and motorcycle type filters |
-| | `houses.html` | Real estate listing with BHK, sq.ft, and furnishing filters |
-| | `furniture.html` | Furnishing inventory with material, dimension, and condition filters |
-| | `item-details.html` | Complete specifications view, pricing breakdown, and booking launcher |
-| | `search.html` | Global catalog search with live filtering and multi-parameter sorting |
-| | `booking.html` | Reservation scheduler with live availability check & duration discounts |
-| | `booking-confirmation.html` | Printable booking voucher with unique booking reference code |
-| | `billing.html` | Detailed GST invoice breakdown with print & download options |
-| | `payment.html` | Simulated payment terminal (Cash, UPI Demo, Card Demo) |
-| | `my-bookings.html` | Customer active and historical booking reservations management |
-| | `rental-history.html` | Completed rental transactions and item check-in log |
-| | `profile.html` | Customer account details and profile update interface |
-| **Admin** | `admin-dashboard.html` | Fleet telemetry, revenue metrics, and interactive Chart.js graphs |
-| | `manage-items.html` | Fleet inventory manager (Add, Edit, Enable/Disable, Delete) |
-| | `manage-customers.html` | Customer directory with account suspension / activation controls |
-| | `manage-bookings.html` | Reservation status control (Approve, Complete, Cancel) |
-| | `manage-payments.html` | Financial ledger tracking transactions, deposits, and refunds |
-| | `return-management.html` | Check-in inspection terminal, late fee & damage fee settlement |
-| | `reports.html` | Revenue analytics, category distributions, and CSV file exports |
-| | `admin-profile.html` | Administrator account profile & password update console |
+| Customer Marketplace | `/index.html`, `/cars.html` | Catalog browsing, rental categories, search, and filters |
+| Reservation Scheduler | `/booking.html` | Date selection, availability validation, and rental calculations |
+| Itemized Invoicing | `/billing.html`, `/payment.html` | Invoice breakdown and simulated payment workflow |
+| Administrative Dashboard | `/admin-dashboard.html` | Operational statistics and Chart.js visualizations |
+| Return Management | `/return-management.html` | Return inspection, overdue fees, damage assessment, and deposit settlement |
+
+### Adding Application Screenshots
+
+To make the repository more visually informative, capture screenshots while the application is running locally.
+
+Store screenshots in:
+
+```text
+docs/
+└── screenshots/
+    ├── marketplace.png
+    ├── booking.png
+    ├── invoicing.png
+    ├── admin-dashboard.png
+    └── return-management.png
+```
+
+Once the screenshots are added, they can be displayed in this section using standard Markdown image links.
+
+For example:
+
+```markdown
+![Customer Marketplace](docs/screenshots/marketplace.png)
+```
 
 ---
 
-## Database Design & Setup
+## Database Design
 
-The database uses **MySQL 8.0** with the InnoDB storage engine for strict foreign key constraints and ACID transactional guarantees.
+The relational database is implemented using MySQL 8.0 and the InnoDB storage engine.
 
-### Step 1: Execute Schema & Seed Scripts in MySQL
+The schema uses separate tables for authentication, customers, rental inventory, category-specific attributes, bookings, invoices, payments, returns, and activity logs.
 
-Open MySQL Workbench or your MySQL terminal and run:
+### Entity Relationship Overview
+
+```text
++---------------+        1:N        +-------------------+
+|     users     | ----------------> |     bookings      |
++---------------+                   +-------------------+
+       |                                      |
+      1:1                                     1:1
+       |                                      |
++---------------+                   +-------------------+
+|   customers   |                   |     invoices      |
++---------------+                   +-------------------+
+                                              |
+                                             1:N
+                                              |
+                                    +-------------------+
+                                    |     payments      |
+                                    +-------------------+
+                                              |
+                                             1:1
+                                              |
+                                    +-------------------+
+                                    |      returns      |
+                                    +-------------------+
+
++---------------+        1:N
+|  rental_items | ----------------> Category Subtype Tables
++---------------+                    cars
+                                     bikes
+                                     houses
+                                     furniture
+```
+
+### Relational Schema Summary
+
+The project database contains 13 relational tables according to the supplied schema documentation.
+
+| Table | Purpose |
+|---|---|
+| `users` | Authentication records, password hashes, roles, and account status |
+| `admins` | Administrator profiles and departmental information |
+| `customers` | Customer contact information and addresses |
+| `rental_items` | Common rental catalog metadata |
+| `cars` | Automotive specifications |
+| `bikes` | Motorcycle specifications |
+| `houses` | Residential property specifications |
+| `furniture` | Furniture specifications |
+| `bookings` | Reservation dates, pricing, discounts, deposits, and status |
+| `payments` | Payment transaction references, methods, amounts, and status |
+| `invoices` | Itemized billing information |
+| `returns` | Return inspection and settlement records |
+| `activity_logs` | Records of important system actions |
+
+For the complete entity relationship diagram and field specifications, see:
+
+[Database Design Documentation](database/DATABASE_DESIGN.md)
+
+---
+
+## Security Implementation
+
+Security is implemented across authentication, session handling, authorization, database operations, and frontend input rendering.
+
+### 1. Password Hashing and Key Derivation
+
+- Passwords are hashed using PBKDF2-HMAC-SHA256 with 600,000 iterations and unique 16-byte cryptographically secure salts.
+- Key derivation and salt generation use the Windows Cryptography API: Next Generation.
+- Relevant functions include `BCryptDeriveKeyPBKDF2` and `BCryptGenRandom`.
+- Password verification uses constant-time comparison through `PasswordHasher::constantTimeCompare`.
+- A migration mechanism upgrades legacy password hashes following successful authentication.
+
+### 2. Session Management and IDOR Protection
+
+- Sessions use cryptographically secure random tokens containing 256 bits of random data.
+- Tokens use the format `SRMS-<64-hex-characters>`.
+- A 24-hour session expiration period is enforced on protected endpoints.
+- Active tokens are invalidated upon logout.
+- Customer authorization checks restrict access to their own bookings, invoices, and payments.
+
+### 3. Concurrency Safety and Double-Booking Prevention
+
+- Booking requests use an exclusive `std::recursive_mutex` and an RAII `TransactionGuard`.
+- Availability is checked inside a database transaction.
+- Overlapping booking requests are rejected with HTTP 409 Conflict when a conflicting reservation exists.
+
+### 4. Input Sanitization and Network Hardening
+
+- Database operations use SQL input handling and parameterized statements where implemented.
+- The `escapeHtml` utility escapes dynamic user input before rendering it into DOM elements.
+- CORS handling validates request origins against an explicitly trusted list.
+- Untrusted preflight `OPTIONS` requests are rejected with HTTP 403 Forbidden.
+- Responses omit `Access-Control-Allow-Origin` when the requesting origin is not trusted.
+
+---
+
+## Testing and Verification
+
+The project includes standalone C++ unit tests and Python-based live integration and concurrency test scripts.
+
+### 1. Standalone C++ Unit Test Suite
+
+The C++ test runner covers business logic and core programming concepts without requiring a live database.
+
+Run:
+
+```powershell
+$env:PATH = "C:\Program Files\MySQL\MySQL Server 8.0\lib;$env:PATH"
+.\build\run_tests.exe
+```
+
+The supplied test report identifies coverage for:
+
+| Test Area | Description |
+|---|---|
+| Password Hashing | PBKDF2-HMAC-SHA256 password hashing |
+| Polymorphism | Polymorphic rental calculations and factory pattern |
+| Operator Overloading | Custom comparison operators |
+| Friend Functions | Rental value comparison and stream insertion |
+| Templates | Generic repository implementation |
+| Return Settlement | Overdue days, late fees, and deposit refunds |
+| Exception Handling | Error handling and input validation |
+| Date Validation | Booking interval overlap detection |
+| Billing | Tiered discounts and billing calculations |
+
+The previously supplied test output reports **9/9 tests passed**.
+
+### 2. Live Automated E2E and Concurrency Tests
+
+The Python test runner starts the C++ server, checks API behavior, executes the booking lifecycle, and tests concurrent reservation requests.
+
+Run:
+
+```powershell
+python tests/run_all_live_tests.py
+```
+
+The supplied test report covers:
+
+- Server health check.
+- Administrator and customer authentication.
+- Authorization barriers for administrator endpoints.
+- Booking date validation.
+- Booking creation.
+- Double-booking collision prevention.
+- Invoice authentication and ownership checks.
+- Payment authorization.
+- Return settlement.
+- Rental item availability restoration.
+- CORS origin validation.
+- Concurrent booking requests.
+
+### 3. Concurrency Test
+
+The supplied concurrency test report describes 10 simultaneous booking requests for the same rental item and overlapping date window.
+
+Reported results:
+
+| HTTP Status | Meaning | Count |
+|---|---|---:|
+| 201 | Reservation created | 1 |
+| 409 | Reservation conflict | 9 |
+
+This demonstrates the intended behavior: only one reservation succeeds while conflicting requests are rejected.
+
+---
+
+## Project Structure
+
+```text
+SmartRentalManagement/
+│
+├── backend/
+│   ├── api/
+│   │   ├── ApiControllerBase.h
+│   │   ├── AuthController.cpp
+│   │   ├── AuthController.h
+│   │   ├── RentalController.cpp
+│   │   ├── RentalController.h
+│   │   ├── BookingController.cpp
+│   │   ├── BookingController.h
+│   │   ├── PaymentController.cpp
+│   │   ├── PaymentController.h
+│   │   ├── AdminController.cpp
+│   │   ├── AdminController.h
+│   │   ├── ReportController.cpp
+│   │   ├── ReportController.h
+│   │   └── httplib.h
+│   │
+│   ├── database/
+│   │   ├── Database.cpp
+│   │   ├── Database.h
+│   │   ├── UserRepository.cpp
+│   │   ├── UserRepository.h
+│   │   ├── RentalRepository.cpp
+│   │   ├── RentalRepository.h
+│   │   ├── BookingRepository.cpp
+│   │   ├── BookingRepository.h
+│   │   ├── PaymentRepository.cpp
+│   │   ├── PaymentRepository.h
+│   │   └── TemplateRepository.h
+│   │
+│   ├── models/
+│   ├── services/
+│   ├── utils/
+│   └── main.cpp
+│
+├── config/
+│   └── database.example.json
+│
+├── database/
+│   ├── schema.sql
+│   ├── seed.sql
+│   └── DATABASE_DESIGN.md
+│
+├── docs/
+│   ├── API_DOCUMENTATION.md
+│   └── OOP_CONCEPTS.md
+│
+├── frontend/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── api.js
+│   └── *.html
+│
+├── tests/
+│   ├── test_main.cpp
+│   ├── test_api_suite.py
+│   ├── test_concurrency_double_booking.py
+│   └── run_all_live_tests.py
+│
+├── CMakeLists.txt
+└── README.md
+```
+
+---
+
+## Prerequisites
+
+The documented build environment targets Windows.
+
+Ensure the following software is installed:
+
+| Tool | Recommended Version | Verification Command |
+|---|---|---|
+| C++ Compiler | GCC 11+ / MinGW-w64 | `g++ --version` |
+| CMake | 3.15+ | `cmake --version` |
+| Ninja | 1.10+ | `ninja --version` |
+| MySQL Server | 8.0 | `mysql --version` |
+| MySQL C Client Library | Compatible with MySQL 8.0 | Verify installed headers and libraries |
+| Python (optional) | 3.8+ | `python --version` |
+
+The MySQL headers and libraries are expected in locations such as:
+
+```text
+C:\Program Files\MySQL\MySQL Server 8.0\include
+C:\Program Files\MySQL\MySQL Server 8.0\lib
+```
+
+---
+
+## Installation and Setup
+
+### 1. Clone the Repository
+
+Open Windows PowerShell and run:
+
+```powershell
+git clone https://github.com/sharadkadam21242124-a11y/Smart-Rental-Management-System.git
+
+cd Smart-Rental-Management-System
+```
+
+### 2. Verify MySQL Service Status
+
+Check whether the MySQL service is running:
+
+```powershell
+Get-Service -Name MySQL*
+```
+
+If the service is stopped, start it from an elevated PowerShell terminal:
+
+```powershell
+Start-Service -Name MySQL80
+```
+
+---
+
+## Database Configuration
+
+### 1. Initialize the Database
+
+Log in to your local MySQL server:
+
+```powershell
+mysql -u root -p
+```
+
+After entering the MySQL password, execute the initialization scripts from the project root directory:
 
 ```sql
--- 1. Create the schema and 13 InnoDB tables
-source database/schema.sql;
+SOURCE database/schema.sql;
 
--- 2. Populate verified seed data (40 items, 10 customers, 2 admins, sample bookings)
-source database/seed.sql;
+SOURCE database/seed.sql;
 ```
 
-### Step 2: Configure Local Credentials
+The schema script creates the database structure, and the seed script inserts initial demonstration data.
 
-Copy `config/database.example.json` to `config/database.json`:
+### 2. Configure Database Credentials
 
-```bash
-cp config/database.example.json config/database.json
+Copy the example configuration file:
+
+```powershell
+Copy-Item config/database.example.json config/database.json
 ```
 
-Edit `config/database.json` with your local MySQL credentials:
+Open `config/database.json` and update the credentials for your local MySQL environment.
+
+Example configuration:
 
 ```json
 {
   "host": "127.0.0.1",
   "port": 3306,
   "database": "smart_rental_db",
-  "username": "YOUR_DATABASE_USERNAME",
-  "password": "YOUR_DATABASE_PASSWORD",
+  "username": "rental_user",
+  "password": "YOUR_LOCAL_PASSWORD_HERE",
   "connectionPoolSize": 5,
   "connect_timeout_seconds": 10
 }
 ```
 
-> **Note:** `config/database.json` is protected by `.gitignore` and is never committed to GitHub.
+**Security Note:** The local `config/database.json` file should be excluded through `.gitignore`. Never commit real database credentials or passwords to GitHub.
 
 ---
 
-## Building from Source
+## Build Instructions
 
-### Prerequisites
+Execute these commands in Windows PowerShell from the project root directory.
 
-- **C++17 Compiler:** GCC 10+ (MinGW-w64 on Windows), Clang 11+, or MSVC 2019/2022
-- **CMake:** Version 3.15 or newer
-- **Build Tool:** Ninja or Make / MSBuild
-- **MySQL 8.0 C Client Library:** (`mysql.h`, `libmysql`)
+### 1. Configure Environment Paths
 
-### Build Steps
+Update the paths according to your local MinGW and MySQL installations:
 
-```bash
-# 1. Create and enter build directory
-mkdir build
-cd build
-
-# 2. Configure with CMake
-cmake -B . -S .. -G "Ninja"
-
-# 3. Compile the application and test suite
-cmake --build .
+```powershell
+$env:PATH = "C:\mingw64\mingw64\bin;C:\Program Files\MySQL\MySQL Server 8.0\lib;$env:PATH"
 ```
 
-This compiles two executables:
-1. `SmartRentalManagement` (the web application and REST API server)
-2. `run_tests` (the standalone OOP verification test suite)
+### 2. Configure CMake
+
+```powershell
+cmake -B build -S . -G "Ninja"
+```
+
+### 3. Compile the Application
+
+```powershell
+cmake --build build
+```
+
+The build is expected to generate:
+
+| Executable | Purpose |
+|---|---|
+| `build/SmartRentalManagement.exe` | Backend server and frontend web host |
+| `build/run_tests.exe` | Standalone C++ unit test runner |
 
 ---
 
-## Running the Application
+## How to Run
 
-Start the server binary:
+Ensure the MySQL client library, including `libmysql.dll`, is accessible through your environment's `PATH`.
 
-```bash
-# From the project root:
-./build/SmartRentalManagement.exe
+From the project root directory, execute:
+
+```powershell
+$env:PATH = "C:\Program Files\MySQL\MySQL Server 8.0\lib;$env:PATH"
+
+.\build\SmartRentalManagement.exe
 ```
 
-The server binds to `http://localhost:8080`.
+The application should connect to MySQL, serve static frontend assets from `./frontend`, and listen on port 8080.
 
-Open your web browser and navigate to:
-```
-http://localhost:8080
-```
+Open your browser and visit:
+
+**[http://localhost:8080](http://localhost:8080)**
+
+Keep the terminal running while using the application.
 
 ---
 
-## Automated OOP Test Suite
+## Demo Credentials
 
-Run the standalone test binary to verify calculations and OOP mechanisms without requiring a database connection:
+The database seed script is documented as initializing the following demonstration accounts:
 
-```bash
-./build/run_tests.exe
-```
-
-### Verified Test Assertions:
-- **Password Hashing:** SHA-256 computation and legacy verification.
-- **Polymorphism & Factory:** Polymorphic rate calculation across Car, Bike, House, Furniture.
-- **Operator Overloading:** `operator<` (price comparison) and `operator==` (identity check).
-- **Friend Functions:** `compareRentalValue` and stream insertion `operator<<`.
-- **Template Repositories:** Generic CRUD operations using `TemplateRepository<T>`.
-- **Return Settlement:** Overdue calculation, tiered late fees, damage assessment, deposit refund.
-- **Exception Handling:** Custom domain exceptions (`ValidationException`, `NotFoundException`, etc.).
-
----
-
-## Verified Demo Credentials
-
-Pre-seeded demonstration accounts for viva and testing:
-
-| Role | Email Address | Password | Permissions |
-|---|---|---|---|
-| **Administrator** | `admin@smartrental.com` | `Password@123` | Full inventory, customers, bookings, returns, reports |
-| **Customer** | `aarav.sharma@gmail.com` | `Password@123` | Catalog browsing, booking, demo payments, profile |
-| **Customer** | `priya.patel@gmail.com` | `Password@123` | Catalog browsing, booking, demo payments, profile |
-
-*(Demo accounts also accept `Admin@2026` / `Customer@2026` via the backward-compatible verification layer).*
-
----
-
-## 29 OOP Concepts Viva Reference
-
-All 29 standard OOP concepts are genuinely implemented in the C++ backend:
-
-| # | Concept | Primary Location in Codebase |
+| Role | Email / Username | Password |
 |---|---|---|
-| 1 | Classes and Objects | `backend/models/*.h`, `backend/models/*.cpp` |
-| 2 | Data Members and Methods | `User.h`, `RentalItem.h`, `Booking.h` |
-| 3 | Encapsulation | Private members with getters, setters, and validation in all models |
-| 4 | Constructors | Default, parameterized, and copy constructors in `Customer`, `Car`, `Booking` |
-| 5 | Destructors & RAII | `Database::~Database()`, `TransactionGuard::~TransactionGuard()` |
-| 6 | Access Specifiers | `public`, `protected`, `private` across all class definitions |
-| 7 | Single Inheritance | `Customer : public User`, `Admin : public User` |
-| 8 | Multilevel Inheritance | `RentalItem` $\rightarrow$ `Car` $\rightarrow$ `LuxuryCar` |
-| 9 | Multiple Inheritance | `ElectricCar : public Car, public BatteryPowered` |
-| 10 | Hierarchical Inheritance | `RentalItem` base for `Car`, `Bike`, `House`, `Furniture` |
-| 11 | Hybrid Inheritance | Combination of hierarchical and multiple inheritance in vehicles |
-| 12 | Virtual Base Classes | Virtual inheritance resolving diamond problem in `HybridVehicle` |
-| 13 | Function Overloading | Multiple `calculateRent()` and `filterItems()` signatures |
-| 14 | Operator Overloading | `operator<`, `operator==`, `operator<<` in `RentalItem` and `QueryRow` |
-| 15 | Function Overriding | `toJson()`, `calculateRent()`, `getSpecifications()` in subclasses |
-| 16 | Virtual Functions | `virtual double calculateRent(...)` in `RentalItem` |
-| 17 | Pure Virtual Functions | `= 0` declarations in `RentalItem` base class |
-| 18 | Abstract Classes | `RentalItem` cannot be instantiated directly |
-| 19 | Friend Functions | `friend bool compareRentalValue(...)` in `RentalItem.h` |
-| 20 | Friend Classes | `friend class RentalItemInspector;` in `RentalItem.h` |
-| 21 | Static Data Members | `Database::s_instance`, `RentalItem::s_itemCount` |
-| 22 | Static Member Functions | `Database::getInstance()`, `RentalItemFactory::createItem()` |
-| 23 | `this` Pointer | Method chaining and disambiguation in model setters |
-| 24 | Class Templates | `TemplateRepository<T>` in `backend/database/TemplateRepository.h` |
-| 25 | Function Templates | `RentalService::sortItems<Comparator>(...)` in `RentalService.h` |
-| 26 | Exception Handling | `try / catch` with custom hierarchy (`Exceptions.h`) |
-| 27 | File Handling & Streams | `Database::loadConfigFromFile()`, CSV report generation in `ReportService` |
-| 28 | Composition vs Aggregation | Composition: `Invoice` contains line items; Aggregation: `BookingService` aggregates repositories |
-| 29 | Design Patterns | Singleton (`Database`), Factory (`RentalItemFactory`), Repository, RAII |
+| Administrator | `admin@smartrental.com` | `Password@123` |
+| Customer | `aarav.sharma@gmail.com` | `Password@123` |
+| Customer | `priya.patel@gmail.com` | `Password@123` |
 
-See [docs/OOP_CONCEPTS.md](docs/OOP_CONCEPTS.md) for full viva defense explanations and code snippets.
+### Access Scope
+
+- **Administrator:** Fleet inventory, customer management, booking controls, return settlements, and revenue reports.
+- **Customer:** Catalog browsing, booking scheduling, invoice review, simulated payments, and profile management.
+
+**Security Warning:** These credentials are intended only for local development and demonstration. Replace or remove demonstration accounts before deploying the application in any publicly accessible environment.
 
 ---
 
-## REST API Endpoints Reference
+## API Documentation
 
-| Method | Endpoint | Access | Purpose |
+The backend exposes JSON REST API endpoints under the `/api` route.
+
+The following table summarizes key endpoints:
+
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `GET` | `/api/health` | Public | Server and database health check |
-| `POST` | `/api/login` | Public | Authenticate user & issue session token |
-| `POST` | `/api/register` | Public | Customer registration |
-| `POST` | `/api/logout` | Authenticated | Terminate active user session |
-| `GET` | `/api/profile` | Authenticated | Retrieve logged-in user profile details |
-| `PUT` | `/api/profile` | Authenticated | Update user profile information |
-| `POST` | `/api/change-password` | Authenticated | Change user account password |
-| `GET` | `/api/categories` | Public | List available rental categories |
-| `GET` | `/api/items` | Public | Filtered & sorted rental items catalog |
-| `GET` | `/api/items/:id` | Public | Detailed specification of a single item |
-| `POST` | `/api/items` | Admin Only | Add a new rental item |
-| `PUT` | `/api/items/:id` | Admin Only | Update an existing rental item |
-| `DELETE` | `/api/items/:id` | Admin Only | Delete an unreserved rental item |
-| `GET` | `/api/availability` | Public | Check date availability for an item |
-| `GET` | `/api/bookings` | Authenticated | Retrieve customer bookings or all admin bookings |
-| `GET` | `/api/bookings/:id` | Authenticated | Retrieve single booking details |
-| `POST` | `/api/bookings` | Customer | Create a new rental reservation |
-| `PUT` | `/api/bookings/:id/cancel`| Customer/Admin | Cancel an eligible reservation |
-| `GET` | `/api/invoices/:booking_id`| Authenticated | Get itemized invoice breakdown |
-| `GET` | `/api/payments` | Authenticated | List user payments or all admin transactions |
-| `POST` | `/api/payments` | Authenticated | Record a simulated payment transaction |
-| `GET` | `/api/returns` | Admin Only | List all check-in return records |
-| `POST` | `/api/returns` | Admin Only | Process item check-in, late fee, and refund |
-| `GET` | `/api/admin/dashboard` | Admin Only | Audited KPI telemetry & revenue metrics |
-| `GET` | `/api/admin/customers` | Admin Only | List all registered customers |
-| `PUT` | `/api/admin/customers/:id/status`| Admin Only | Enable or suspend a customer account |
-| `GET` | `/api/reports/revenue` | Admin Only | Monthly revenue and earnings metrics |
-| `GET` | `/api/reports/categories` | Admin Only | Inventory distribution across categories |
-| `GET` | `/api/reports/export/revenue` | Admin Only | Download revenue report as CSV |
-| `GET` | `/api/reports/export/bookings`| Admin Only | Download bookings report as CSV |
-| `GET` | `/api/reports/export/inventory`| Admin Only| Download inventory report as CSV |
+| `GET` | `/api/health` | Public | Checks system and database connectivity |
+| `POST` | `/api/login` | Public | Authenticates users and returns a session token |
+| `POST` | `/api/register` | Public | Registers a customer account |
+| `POST` | `/api/logout` | Authenticated | Invalidates the active session |
+| `GET` | `/api/items` | Public | Retrieves rental items with filters |
+| `GET` | `/api/items/:id` | Public | Retrieves details for a rental item |
+| `GET` | `/api/availability` | Public | Checks rental availability for a date window |
+| `GET` | `/api/bookings` | Authenticated | Retrieves customer bookings or all bookings for administrators |
+| `POST` | `/api/bookings` | Customer | Creates a booking reservation |
+| `PUT` | `/api/bookings/:id/cancel` | Customer / Admin | Cancels an eligible reservation |
+| `GET` | `/api/invoices/:id` | Authenticated | Retrieves an itemized invoice |
+| `POST` | `/api/payments` | Authenticated | Records a simulated payment |
+| `POST` | `/api/returns` | Admin | Processes a rental return settlement |
+| `GET` | `/api/admin/dashboard` | Admin | Retrieves dashboard statistics |
+| `GET` | `/api/reports/export/:type` | Admin | Exports administrative CSV reports |
 
-See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for payload schemas and sample JSON responses.
+For complete request payloads, response structures, and error codes, refer to:
+
+[API Documentation](docs/API_DOCUMENTATION.md)
 
 ---
 
-## Security Features
+## Known Limitations
 
-- **CSPRNG Salted Password Hashing:** Passwords hashed with cryptographically generated salts via Windows CNG (`BCryptGenRandom`) using constant-time comparison to prevent timing side-channel attacks, with seamless legacy migration.
-- **256-Bit Cryptographic Session Tokens:** Unpredictable CSPRNG session tokens generated using system entropy (`SRMS-<64-char-hex>`).
-- **Session Expiration & Invalidation:** Strict 24-hour TTL expiration enforced on every protected route with active session invalidation upon logout.
-- **ACID Double-Booking Prevention:** Concurrency-safe MySQL transactions with row-level locks (`SELECT ... FOR UPDATE`) on inventory and booking records to prevent simultaneous reservation collisions.
-- **Strict Endpoint Authorization & IDOR Protection:** Customer ownership checks on invoices (`/api/invoices/:id`) and payments (`/api/payments`), preventing cross-customer data exposure.
-- **CORS & XSS Sanitization:** Wildcard OPTIONS preflight handling and centralized DOM sanitization (`escapeHtml`) on dynamic user inputs.
-- **SQL Injection Prevention:** All SQL queries utilize prepared statements and escaping (`mysql_real_escape_string`).
-- **Role-Based Access Control (RBAC):** Admin endpoints strictly gated; unauthorized customer attempts receive HTTP 403 Forbidden.
-- **Credential Hygiene:** Credentials and private configurations excluded from version control via `.gitignore`.
+The current implementation has the following documented limitations:
+
+1. **Simulated Payment Processing:** Payment handling is intended for demonstration. It records payment methods and transaction references without communicating with external banking gateways.
+
+2. **Windows CNG Cryptography:** Password hashing and cryptographic random generation rely on the Windows Cryptography API. Cross-platform support would require an abstraction using a portable cryptography library such as OpenSSL or libsodium.
+
+3. **In-Memory Session Store:** Active sessions are stored in server process memory. Multiple backend instances would require a shared session store, such as Redis.
+
+4. **Single Connection Synchronization:** Database operations share a connection handle protected through `std::recursive_mutex`. Higher-concurrency workloads would benefit from a properly implemented multi-connection pool.
+
+---
+
+## Future Improvements
+
+Potential enhancements for future development include:
+
+- [ ] **Cross-Platform Cryptography:** Implement a portable cryptography provider for Linux and macOS.
+- [ ] **Real Payment Gateway Integration:** Integrate payment providers such as Razorpay or Stripe with secure webhook handling.
+- [ ] **Containerization:** Add Docker and Docker Compose configurations for the backend and MySQL service.
+- [ ] **Automated Email Notifications:** Send booking confirmations, invoices, and return settlement notifications.
+- [ ] **Distributed Session Storage:** Add Redis-backed session persistence for multi-instance deployments.
+- [ ] **Enhanced Monitoring:** Add structured logging, performance metrics, and centralized error monitoring.
+- [ ] **Deployment Automation:** Introduce CI workflows for automated builds and testing.
+
+---
+
+## Learning Outcomes
+
+This project provides practical exposure to several software engineering concepts.
+
+### C++17 Programming
+
+- Modern C++ standard library features.
+- Object-oriented programming and polymorphism.
+- Smart pointers and resource management.
+- Templates and operator overloading.
+- Exception handling and custom exceptions.
+
+### Database Engineering
+
+- Relational database design and normalization.
+- MySQL schema implementation.
+- Foreign key relationships and constraints.
+- Transaction management and consistency.
+- SQL queries and prepared statements.
+
+### Backend Development
+
+- REST API design using C++.
+- HTTP request and response handling.
+- Authentication and authorization.
+- Business logic separation.
+- Thread synchronization and concurrency handling.
+
+### Full-Stack Development
+
+- HTML, CSS, and JavaScript integration.
+- Asynchronous frontend API communication.
+- Responsive interface development.
+- Dashboard visualization with Chart.js.
+
+### Software Engineering Practices
+
+- Layered architecture.
+- RAII-based resource management.
+- Unit and integration testing.
+- Security-conscious application design.
+- Git and GitHub project management.
+
+---
+
+## License
+
+A formal open-source license has not yet been added to this repository.
+
+The project is currently provided for evaluation, portfolio review, and educational demonstration purposes. For reuse, redistribution, or commercial inquiries, contact the repository owner or open an issue.
+
+---
+
+**Developed as a software engineering project demonstrating modern C++ backend development, relational database management, REST API design, and full-stack application integration.**

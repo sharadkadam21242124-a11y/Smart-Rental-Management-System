@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <memory>
 #include <csignal>
 
@@ -149,6 +150,10 @@ int main(int argc, char* argv[]) {
         // 8. Launch Server
         std::string host = "0.0.0.0";
         int port = 8080;
+        const char* envPort = std::getenv("PORT");
+        if (envPort && std::strlen(envPort) > 0) {
+            try { port = std::stoi(envPort); } catch (...) {}
+        }
         std::cout << "\n--------------------------------------------------------" << std::endl;
         std::cout << " Server is RUNNING at:  http://localhost:" << port << std::endl;
         std::cout << " Open your web browser to: http://localhost:" << port << std::endl;

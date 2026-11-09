@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 #if defined(USE_MYSQL_CLIENT)
 #include <mysql.h>
@@ -119,9 +120,26 @@ void Database::loadConfigFromFile(const std::string& configFilePath) {
     std::string pass = JsonHelper::extractString(content, "password");
     if (!pass.empty()) cfg.password = pass;
 
+    // Cloud Environment Variable overrides (12-Factor App pattern)
+    const char* envHost = std::getenv("DB_HOST");
+    if (envHost && std::strlen(envHost) > 0) cfg.host = envHost;
+
+    const char* envPort = std::getenv("DB_PORT");
+    if (envPort && std::strlen(envPort) > 0) {
+        try { cfg.port = std::stoi(envPort); } catch (...) {}
+    }
+
+    const char* envDb = std::getenv("DB_NAME");
+    if (!envDb) envDb = std::getenv("DB_DATABASE");
+    if (envDb && std::strlen(envDb) > 0) cfg.database = envDb;
+
+    const char* envUser = std::getenv("DB_USER");
+    if (!envUser) envUser = std::getenv("DB_USERNAME");
+    if (envUser && std::strlen(envUser) > 0) cfg.username = envUser;
+
     const char* envPass = std::getenv("DB_PASSWORD");
     if (!envPass) envPass = std::getenv("MYSQL_PASSWORD");
-    if (cfg.password.empty() && envPass) {
+    if (envPass && std::strlen(envPass) > 0) {
         cfg.password = envPass;
     }
 

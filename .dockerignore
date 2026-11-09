@@ -1,0 +1,11 @@
+build/
+bin/
+out/
+.git/
+*.pyc
+__pycache__/
+*.exe
+*.o
+*.obj
+config/database.json
+

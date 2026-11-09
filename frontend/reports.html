@@ -46,15 +46,15 @@
           <p class="text-muted small mb-0">Audited revenue metrics, duration analytics, category distribution & CSV file exports</p>
         </div>
         <div class="mt-2 mt-md-0 d-flex flex-wrap gap-2">
-          <a href="/api/reports/export/revenue" target="_blank" class="btn btn-outline-success btn-sm">
+          <button onclick="downloadReport('/api/reports/export/revenue', 'revenue_report.csv')" class="btn btn-outline-success btn-sm">
             <i class="fa-solid fa-file-csv me-1"></i>Export Revenue CSV
-          </a>
-          <a href="/api/reports/export/bookings" target="_blank" class="btn btn-outline-primary btn-sm">
+          </button>
+          <button onclick="downloadReport('/api/reports/export/bookings', 'bookings_report.csv')" class="btn btn-outline-primary btn-sm">
             <i class="fa-solid fa-file-csv me-1"></i>Export Bookings CSV
-          </a>
-          <a href="/api/reports/export/inventory" target="_blank" class="btn btn-outline-secondary btn-sm">
+          </button>
+          <button onclick="downloadReport('/api/reports/export/inventory', 'inventory_report.csv')" class="btn btn-outline-secondary btn-sm">
             <i class="fa-solid fa-file-csv me-1"></i>Export Inventory CSV
-          </a>
+          </button>
         </div>
       </div>
 
@@ -176,6 +176,31 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="js/api.js"></script>
   <script>
+    async function downloadReport(url, filename) {
+      try {
+        const token = Auth.getToken();
+        const res = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({}));
+          throw new Error(errJson.error || 'Failed to download report (HTTP ' + res.status + ')');
+        }
+        const blob = await res.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(blobUrl);
+        showToast('Report downloaded: ' + filename, 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
     async function loadReports() {
       try {
         const res = await API.get('/admin/dashboard');

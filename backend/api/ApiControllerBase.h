@@ -15,10 +15,14 @@
 class ApiControllerBase {
 public:
     static bool isTrustedOrigin(const std::string& origin) {
-        if (origin.empty()) return false;
-        return (origin == "http://localhost:8080" || origin == "http://127.0.0.1:8080" ||
-                origin == "http://localhost:3000" || origin == "http://localhost:5500" ||
-                origin == "http://127.0.0.1:5500");
+        if (origin.empty()) return true;
+        if (origin.find("localhost") != std::string::npos ||
+            origin.find("127.0.0.1") != std::string::npos ||
+            origin.find(".onrender.com") != std::string::npos ||
+            origin.find("render.com") != std::string::npos) {
+            return true;
+        }
+        return false;
     }
 
     static void setCorsHeaders(httplib::Response& res, const std::string& origin = "") {

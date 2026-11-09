@@ -55,15 +55,42 @@ set(SOURCES
 
 # MySQL Detection
 set(MYSQL_FOUND_CUSTOM FALSE)
-set(MYSQL_SEARCH_PATHS
-    "C:/Program Files/MySQL/MySQL Server 8.0"
-    "C:/Program Files/MySQL/MySQL Server 8.1"
-    "C:/Program Files/MySQL/MySQL Server 8.2"
-    "$ENV{MYSQL_DIR}"
+
+find_path(MYSQL_INCLUDE_DIR NAMES mysql.h
+    PATHS
+        "/usr/include/mysql"
+        "/usr/local/include/mysql"
+        "/usr/include"
+        "/usr/local/include"
+        "C:/Program Files/MySQL/MySQL Server 8.0"
+        "C:/Program Files/MySQL/MySQL Server 8.1"
+        "C:/Program Files/MySQL/MySQL Server 8.2"
+        "$ENV{MYSQL_DIR}"
+    PATH_SUFFIXES include mysql include/mysql
 )
 
-find_path(MYSQL_INCLUDE_DIR NAMES mysql.h PATHS ${MYSQL_SEARCH_PATHS} PATH_SUFFIXES include)
-find_library(MYSQL_LIBRARY NAMES libmysql mysqlclient PATHS ${MYSQL_SEARCH_PATHS} PATH_SUFFIXES lib)
+find_library(MYSQL_LIBRARY NAMES mysqlclient libmysql mariadb
+    PATHS
+        "/usr/lib"
+        "/usr/local/lib"
+        "/usr/lib/x86_64-linux-gnu"
+        "/usr/lib/aarch64-linux-gnu"
+        "C:/Program Files/MySQL/MySQL Server 8.0"
+        "C:/Program Files/MySQL/MySQL Server 8.1"
+        "C:/Program Files/MySQL/MySQL Server 8.2"
+        "$ENV{MYSQL_DIR}"
+    PATH_SUFFIXES lib lib/x86_64-linux-gnu x86_64-linux-gnu
+)
+
+# Direct UNIX fallback if headers exist in standard Debian/Ubuntu location
+if (NOT MYSQL_INCLUDE_DIR AND UNIX)
+    if (EXISTS "/usr/include/mysql/mysql.h")
+        set(MYSQL_INCLUDE_DIR "/usr/include/mysql")
+    endif()
+endif()
+if (NOT MYSQL_LIBRARY AND UNIX)
+    set(MYSQL_LIBRARY "mysqlclient")
+endif()
 
 if (MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY)
     message(STATUS "Found MySQL Client: ${MYSQL_INCLUDE_DIR} and ${MYSQL_LIBRARY}")
@@ -71,7 +98,7 @@ if (MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY)
     add_definitions(-DUSE_MYSQL_CLIENT)
     set(MYSQL_FOUND_CUSTOM TRUE)
 else()
-    message(WARNING "MySQL client libraries not detected via CMake search. Building with internal MySQL connector module.")
+    message(FATAL_ERROR "MySQL client libraries (mysql.h / libmysqlclient) are required to build SmartRentalManagement.")
 endif()
 
 add_executable(SmartRentalManagement ${SOURCES})

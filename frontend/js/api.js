@@ -5,9 +5,9 @@
  * ============================================================================
  */
 
-const API_BASE = (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1'))
+const API_BASE = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
   ? `${window.location.origin}/api`
-  : 'http://localhost:8080/api';
+  : '/api';
 
 const API = {
   getToken() {

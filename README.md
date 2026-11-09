@@ -1,39 +1,57 @@
 # Smart Rental Management System
 
-### A Full-Stack Multi-Category Rental & Inventory Management Platform
+### A Full-Stack, Multi-Category Rental & Inventory Management Platform
 
-[![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0_InnoDB-4479A1?logo=mysql)](https://www.mysql.com/)
-[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap)](https://getbootstrap.com/)
-[![Chart.js](https://img.shields.io/badge/Chart.js-4.4-FF6384?logo=chartdotjs)](https://www.chartjs.org/)
-[![CMake](https://img.shields.io/badge/CMake-3.15%2B-064F8C?logo=cmake)](https://cmake.org/)
+<p align="center">
+  <a href="https://smart-rental-management-system-gxri.onrender.com">
+    <img src="https://img.shields.io/badge/Live%20Demo-Visit%20Application-46E3B7?style=for-the-badge&logo=render" alt="Live Demo">
+  </a>
+  <a href="https://github.com/sharadkadam21242124-a11y/Smart-Rental-Management-System">
+    <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github" alt="GitHub Repository">
+  </a>
+</p>
 
-A full-stack rental and inventory management platform engineered using modern **C++17**, featuring an embedded multi-threaded HTTP REST server (`cpp-httplib`), **MySQL 8.0 with InnoDB**, and a responsive web application comprising 28 dedicated interface pages.
+<p align="center">
+  <img src="https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B" alt="C++17">
+  <img src="https://img.shields.io/badge/MySQL-8.0%2F8.4-4479A1?logo=mysql" alt="MySQL">
+  <img src="https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker" alt="Docker">
+  <img src="https://img.shields.io/badge/Render-Deployed-46E3B7?logo=render" alt="Render">
+  <img src="https://img.shields.io/badge/Aiven-Cloud%20Database-FF3554?logo=aiven" alt="Aiven">
+  <img src="https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap" alt="Bootstrap">
+  <img src="https://img.shields.io/badge/Chart.js-4.4-FF6384?logo=chartdotjs" alt="Chart.js">
+  <img src="https://img.shields.io/badge/CMake-3.15%2B-064F8C?logo=cmake" alt="CMake">
+</p>
 
-The system unifies multi-domain rental operations — spanning automotive vehicles, motorcycles, residential properties, and office furniture — into a single platform with booking scheduling, itemized invoicing, return inspection settlements, role-based access control, and administrative analytics.
+A full-stack rental and inventory management platform engineered using **C++17**, an embedded HTTP REST server powered by **cpp-httplib**, and **MySQL with InnoDB**. The application provides a responsive web interface with 28 dedicated frontend pages and supports multiple rental categories through a unified management system.
+
+The platform brings together automotive vehicles, motorcycles, residential properties, and furniture under one application. It provides catalog management, availability validation, reservation scheduling, itemized invoicing, simulated payments, return inspections, settlement calculations, role-based access control, and administrative analytics.
+
+**Live Application:** [https://smart-rental-management-system-gxri.onrender.com](https://smart-rental-management-system-gxri.onrender.com)
 
 ---
 
 ## Table of Contents
 
+- [Live Deployment](#live-deployment)
 - [Project Overview](#project-overview)
 - [Key Features](#key-features)
 - [Supported Rental Categories](#supported-rental-categories)
 - [Technology Stack](#technology-stack)
 - [System Architecture](#system-architecture)
-- [Application Workflow](#application-workflow)
-- [Screenshots and Visual Interface Tour](#screenshots-and-visual-interface-tour)
+- [Application Workflows](#application-workflows)
+- [Screenshots](#screenshots)
 - [Database Design](#database-design)
 - [Security Implementation](#security-implementation)
 - [Testing and Verification](#testing-and-verification)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
-- [Installation and Setup](#installation-and-setup)
+- [Local Installation](#local-installation)
 - [Database Configuration](#database-configuration)
-- [Build Instructions](#build-instructions)
-- [How to Run](#how-to-run)
-- [Demo Credentials](#demo-credentials)
+- [Docker Setup](#docker-setup)
+- [Cloud Deployment](#cloud-deployment)
+- [Running Locally](#running-locally)
 - [API Documentation](#api-documentation)
+- [Demo Access](#demo-access)
 - [Known Limitations](#known-limitations)
 - [Future Improvements](#future-improvements)
 - [Learning Outcomes](#learning-outcomes)
@@ -41,58 +59,190 @@ The system unifies multi-domain rental operations — spanning automotive vehicl
 
 ---
 
+## Live Deployment
+
+The application is deployed using a containerized architecture with a managed cloud database.
+
+| Component | Technology | Responsibility |
+|---|---|---|
+| Application Hosting | Render | Hosts the Dockerized C++ application |
+| Containerization | Docker | Packages the application and runtime dependencies |
+| Backend | C++17 | Handles business logic and REST API requests |
+| HTTP Server | cpp-httplib | Serves API endpoints and frontend assets |
+| Cloud Database | Aiven MySQL | Provides managed relational database services |
+| Frontend | HTML, CSS, JavaScript | Provides the user interface |
+| Database Connectivity | MySQL C API | Connects the backend to MySQL |
+
+**Live URL:** [Open Smart Rental Management System](https://smart-rental-management-system-gxri.onrender.com)
+
+**GitHub Repository:** [View Source Code](https://github.com/sharadkadam21242124-a11y/Smart-Rental-Management-System)
+
+> **Deployment note:** The application is hosted on Render. Depending on the hosting plan, the service may sleep after inactivity and take some time to respond to the first request. Cloud database availability and usage are subject to the provider's plan and limits.
+
+---
+
 ## Project Overview
 
-Many rental businesses operate across distinct product domains, such as fleet vehicles, event equipment, residential properties, and furniture. However, standard management software often isolates these domains into separate products.
+### The Problem
 
-The **Smart Rental Management System** addresses this challenge by bringing multiple rental categories together under one platform. Its data architecture supports category-specific specifications while standardizing booking calendars, pricing calculations, itemized billing, and return settlements.
+Rental businesses often operate across different product categories, including vehicles, residential properties, motorcycles, and furniture.
 
-### Why This Project Is Technically Interesting
+Managing these operations independently can create fragmented workflows for inventory tracking, availability checking, reservation management, invoicing, customer records, and return settlements.
 
-- **Native C++ Backend:** The core backend is built in C++17 rather than relying on managed runtime environments such as Node.js or Python. It demonstrates modern C++ concepts, smart pointers, RAII-based resource management, and direct integration with the MySQL C API.
+A unified system can simplify these operations by providing a centralized platform with consistent business rules and category-specific inventory information.
 
-- **Embedded Web Server:** Uses `cpp-httplib` to serve JSON REST API endpoints and static frontend pages directly through the compiled application on port 8080.
+### The Solution
 
-- **Concurrency-Safe Reservations:** Uses date-interval validation, database transactions, and thread synchronization to prevent overlapping reservations.
+The Smart Rental Management System provides a centralized platform for managing multiple rental categories through one application.
 
-- **Zero-Build Frontend:** Uses HTML5, CSS3, Vanilla JavaScript, and Bootstrap 5.3 without requiring a Node.js or npm compilation workflow.
+Its architecture combines a C++ backend, relational database, and responsive frontend to manage the complete rental lifecycle.
 
-- **Relational Database Design:** Uses MySQL 8.0 with InnoDB, foreign keys, and transactional operations to maintain data consistency.
+The system focuses on:
+
+- Centralized multi-category inventory management.
+- Date-based reservation and availability validation.
+- Automated rental price calculations.
+- Itemized billing and simulated payment records.
+- Return inspections and security deposit settlements.
+- Customer and administrator workflows.
+- Operational analytics and report generation.
+
+### Engineering Highlights
+
+**Native C++ Backend**
+
+Built using C++17, demonstrating object-oriented programming, resource management, exception handling, templates, and database integration.
+
+**Embedded REST Server**
+
+Uses cpp-httplib to handle HTTP requests, expose JSON API endpoints, and serve frontend assets.
+
+**Relational Database Engineering**
+
+Uses MySQL and InnoDB for structured data storage, relational integrity, and transactional operations.
+
+**Concurrency-Aware Reservations**
+
+Implements date-interval validation, synchronization, and database transaction handling to manage conflicting reservations.
+
+**Containerized Deployment**
+
+Uses Docker to package the application and its runtime dependencies for cloud deployment.
+
+**Full-Stack Integration**
+
+Connects the C++ backend, MySQL database, and JavaScript frontend through asynchronous REST API communication.
 
 ---
 
 ## Key Features
 
-- **Dynamic Catalog and Filtering:** Search and filter rental items by category, daily rate, location, transmission, fuel type, engine capacity, square footage, and material dimensions.
+### 1. Multi-Category Inventory Management
 
-- **Mathematical Interval Scheduling:** Validates booking date windows against existing reservations using half-open interval overlap logic:
+Manage different rental categories through a centralized catalog.
 
-  `start_date < existing_end AND end_date > existing_start`
+- Cars
+- Bikes and motorcycles
+- Houses and residential properties
+- Furniture and equipment
 
-- **Concurrency-Safe Reservations:** Synchronizes reservation creation through an RAII `TransactionGuard` and mutex locks to prevent simultaneous double-booking collisions.
+### 2. Dynamic Catalog and Filtering
 
-- **Itemized Billing and Discounts:** Generates detailed billing statements with duration-based discounts and explicit separation of security deposit liabilities from rental charges.
+Search and filter rental items using category-specific attributes such as:
 
-- **Simulated Payment Gateway:** Supports demonstration payments through Cash, UPI Demo, and Card Demo methods, generating transaction references and updating booking states.
+- Rental category
+- Daily rental price
+- Location
+- Fuel type
+- Transmission
+- Engine capacity
+- Seating capacity
+- Property area and furnishing
+- Furniture material and dimensions
 
-- **Return Inspection and Settlement:** Provides an administrative check-in workflow that calculates overdue days, late fees, damage deductions, and net security deposit refunds.
+### 3. Booking and Availability Management
 
-- **Administrative Analytics:** Provides a dashboard with Chart.js visualizations for revenue and inventory distribution, along with CSV exports for revenue, bookings, and inventory.
+- Date-based rental scheduling.
+- Availability validation.
+- Booking creation and management.
+- Reservation status tracking.
+- Prevention of overlapping reservations.
 
-- **Role-Based Access Control:** Separates public browsing, customer self-service, and administrator operations through authorization checks.
+The booking overlap condition follows half-open interval logic:
+
+```sql
+start_date < existing_end
+AND end_date > existing_start
+```
+
+### 4. Concurrency-Aware Reservations
+
+Reservation operations use synchronization and database transaction management to reduce the risk of simultaneous double bookings.
+
+The system checks availability before completing a reservation and rejects conflicting requests.
+
+### 5. Itemized Invoicing
+
+Generates rental billing information with:
+
+- Rental duration.
+- Daily rental charges.
+- Applicable discounts.
+- Security deposits.
+- Additional charges.
+- Total payable amount.
+
+### 6. Simulated Payment Processing
+
+Supports demonstration payment methods:
+
+- Cash
+- UPI Demo
+- Card Demo
+
+The system records simulated payment transactions and updates relevant booking or invoice statuses.
+
+**Note:** No real banking or external payment gateway transaction is performed.
+
+### 7. Return Inspection and Settlement
+
+Administrators can inspect returned rental items and calculate:
+
+- Overdue rental days.
+- Late fees.
+- Damage deductions.
+- Security deposit adjustments.
+- Net refundable deposit amounts.
+
+### 8. Administrative Dashboard
+
+Provides operational information through dashboard visualizations and reports.
+
+- Revenue analytics.
+- Inventory distribution.
+- Booking statistics.
+- Rental management.
+- Customer management.
+- CSV report exports.
+
+### 9. Role-Based Access Control
+
+Separates application permissions into customer and administrator roles.
+
+Customers access their own rental information, while administrators manage inventory, reservations, customers, returns, and reports.
 
 ---
 
 ## Supported Rental Categories
 
-The system models four rental domains, each with category-specific relational attributes.
+The application supports four rental domains with category-specific attributes.
 
-| Category | Primary Attributes | Domain-Specific Filters |
+| Category | Primary Attributes | Example Filters |
 |---|---|---|
-| Cars | Brand, model, year, fuel type, seating capacity, transmission, registration number, mileage | Transmission, fuel type, seating capacity |
-| Bikes | Brand, model, year, engine displacement, bike type, registration number, helmet included | Engine capacity, motorcycle type |
-| Houses | Property type, bedrooms, bathrooms, furnishing status, area, address, parking | BHK count, furnishing, property type |
-| Furniture | Furniture type, material, color, condition, dimensions, assembly requirement | Material, dimensions, assembly requirement |
+| Cars | Brand, model, year, fuel type, seating, transmission, mileage | Fuel type, transmission, seating |
+| Bikes | Brand, model, year, engine displacement, bike type | Engine capacity, motorcycle type |
+| Houses | Property type, bedrooms, bathrooms, furnishing, area, parking | BHK, furnishing, property type |
+| Furniture | Furniture type, material, color, condition, dimensions | Material, dimensions, assembly |
 
 ---
 
@@ -103,19 +253,21 @@ The system models four rental domains, each with category-specific relational at
 | Technology | Purpose |
 |---|---|
 | C++17 | Core backend implementation |
-| `cpp-httplib` | Embedded HTTP server and REST API |
-| Custom `JsonHelper` | JSON serialization, deserialization, and string escaping |
-| Windows CNG API | Cryptographic random generation and PBKDF2 key derivation |
+| cpp-httplib | Embedded HTTP server and REST API |
+| MySQL C API | Native database connectivity |
+| Custom JsonHelper | JSON serialization and deserialization |
 | C++ Standard Library | Thread synchronization and resource management |
+| CMake | Build configuration |
 
 ### Database
 
 | Technology | Purpose |
 |---|---|
-| MySQL Server 8.0 | Relational database |
-| InnoDB | Storage engine, foreign keys, and transactions |
-| MySQL C API | Native database connectivity |
-| Prepared Statements | Parameterized SQL operations |
+| MySQL 8.0 / 8.4 | Relational database |
+| InnoDB | Transactional storage engine |
+| Foreign Keys | Referential integrity |
+| Prepared Statements | Parameterized database operations |
+| Aiven MySQL | Managed cloud database hosting |
 
 ### Frontend
 
@@ -123,105 +275,156 @@ The system models four rental domains, each with category-specific relational at
 |---|---|
 | HTML5 | Page structure |
 | CSS3 | Responsive styling |
-| Vanilla JavaScript (ES6+) | Frontend logic and asynchronous API requests |
+| JavaScript ES6+ | Frontend logic and API communication |
 | Bootstrap 5.3 | Responsive UI components |
 | Font Awesome 6 | Interface icons |
-| Chart.js 4.4 | Dashboard data visualization |
+| Chart.js 4.4 | Dashboard visualizations |
 
-### Build and Testing
+### DevOps and Testing
 
 | Technology | Purpose |
 |---|---|
-| CMake 3.15+ | Build configuration |
-| Ninja or Make | Build generation |
-| GCC 11+ / MinGW-w64 | C++ compilation |
-| C++ Test Runner | Unit testing |
-| Python 3.8+ | Automated integration and E2E testing |
+| Docker | Containerization |
+| Render | Cloud application hosting |
+| Aiven | Managed cloud database |
+| CMake | Build system |
+| Ninja / Make | Build generation |
+| GCC / MinGW-w64 | C++ compilation |
+| Python | Integration and automated testing |
 
 ---
 
 ## System Architecture
 
-The application follows a layered architecture that separates HTTP handling, business logic, database operations, and frontend presentation.
+The application follows a layered architecture that separates presentation, HTTP handling, business logic, and database operations.
 
 ```text
-                  +---------------------------------------+
-                  |         Frontend Client                |
-                  | HTML5 / CSS3 / JavaScript / Chart.js   |
-                  +---------------------------------------+
-                                |
+                 +--------------------------------+
+                 |        Frontend Client         |
+                 | HTML / CSS / JavaScript        |
+                 | Bootstrap / Chart.js           |
+                 +--------------------------------+
+                              |
                          REST API / JSON
-                                |
-                  +---------------------------------------+
-                  |          C++17 Backend                |
-                  |       cpp-httplib :8080               |
-                  +---------------------------------------+
-                                |
-             +------------------+------------------+
-             |                  |                  |
-       +-----------+      +-----------+      +-----------+
-       |  Auth API |      | Rental API|      | Booking API|
-       +-----------+      +-----------+      +-----------+
-                                |
-                  +---------------------------------------+
-                  |       Domain Services & Models       |
-                  | Billing / Availability / Returns     |
-                  +---------------------------------------+
-                                |
-                  +---------------------------------------+
-                  |           Repository Layer            |
-                  | SQL Statements / Transactions        |
-                  +---------------------------------------+
-                                |
-                  +---------------------------------------+
-                  |        MySQL 8.0 InnoDB               |
-                  |     Relational Database               |
-                  +---------------------------------------+
+                              |
+                 +--------------------------------+
+                 |         C++17 Backend          |
+                 |        cpp-httplib             |
+                 +--------------------------------+
+                              |
+              +---------------+---------------+
+              |               |               |
+        +-----------+   +-----------+   +-----------+
+        | Auth API  |   | Rental API|   | Booking API|
+        +-----------+   +-----------+   +-----------+
+              |               |               |
+              +---------------+---------------+
+                              |
+                 +--------------------------------+
+                 |      Domain Services & Models  |
+                 | Billing / Availability /       |
+                 | Returns / Business Rules       |
+                 +--------------------------------+
+                              |
+                 +--------------------------------+
+                 |        Repository Layer        |
+                 | SQL Queries / Transactions     |
+                 +--------------------------------+
+                              |
+                 +--------------------------------+
+                 |         MySQL Database         |
+                 |             InnoDB             |
+                 +--------------------------------+
 ```
 
 ### Architectural Principles
 
-1. **Layered Separation of Concerns:** Controllers handle HTTP requests and responses, domain services implement business rules, and repositories manage database operations.
+**Layered Separation of Concerns**
 
-2. **RAII Resource Management:** The `TransactionGuard` class manages transaction completion and rollback behavior during database operations.
+Controllers handle HTTP requests and responses, domain services implement business rules, and repositories manage database operations.
 
-3. **Decoupled Frontend:** Frontend pages communicate with `/api/` endpoints using asynchronous JavaScript `fetch()` requests.
+**RAII Resource Management**
 
-4. **Relational Integrity:** MySQL foreign keys and InnoDB transactions help maintain consistency across related records.
+Resource-management classes help control the lifecycle of database transactions and other resources.
+
+**Decoupled Frontend**
+
+Frontend pages communicate with backend API endpoints through asynchronous JavaScript `fetch()` requests.
+
+**Relational Integrity**
+
+Foreign keys and transactional database operations help maintain consistency across related records.
 
 ---
 
-## Application Workflow
+## Application Workflows
 
-The system provides separate workflows for customers and administrators.
+### Customer Workflow
 
 ```text
-       CUSTOMER WORKFLOW                 ADMINISTRATOR WORKFLOW
+Browse Rental Catalog
+        |
+        v
+Select Rental Category
+        |
+        v
+Filter Rental Items
+        |
+        v
+Check Availability
+        |
+        v
+Create Booking
+        |
+        v
+View Invoice
+        |
+        v
+Simulated Payment
+        |
+        v
+View Booking Details
+```
 
-       Browse Catalog                    Review Dashboard
-             |                                  |
-       Filter Rental Items                Manage Inventory
-             |                                  |
-       Check Availability                 Manage Customers
-             |                                  |
-       Create Booking                     Review Reservations
-             |                                  |
-       Receive Invoice                    Inspect Returned Items
-             |                                  |
-       Simulate Payment                   Calculate Fees & Refunds
-             |                                  |
-       View Booking Details               Complete Settlement
+### Administrator Workflow
+
+```text
+Administrator Login
+        |
+        v
+Review Dashboard
+        |
+        v
+Manage Inventory
+        |
+        v
+Manage Customers
+        |
+        v
+Review Reservations
+        |
+        v
+Inspect Returned Items
+        |
+        v
+Calculate Fees and Refunds
+        |
+        v
+Complete Settlement
+        |
+        v
+Generate Reports
 ```
 
 ### Customer Operations
 
-- Browse available rental categories.
+- Browse rental categories.
 - Search and filter rental items.
 - Check availability for selected dates.
 - Create rental reservations.
 - View itemized invoices.
 - Make demonstration payments.
-- Review personal bookings and account information.
+- Review bookings and account information.
 
 ### Administrator Operations
 
@@ -236,39 +439,21 @@ The system provides separate workflows for customers and administrators.
 
 ---
 
-## Screenshots and Visual Interface Tour
+## Screenshots
 
-The application provides responsive frontend views served through the embedded C++ HTTP server.
+The application includes responsive frontend pages for customers and administrators.
 
-The following table identifies important interfaces that can be demonstrated through screenshots.
+Add genuine application screenshots to `docs/screenshots/` and display them here.
 
-| Interface | Route / File | Description |
-|---|---|---|
-| Customer Marketplace | `/index.html`, `/cars.html` | Catalog browsing, rental categories, search, and filters |
-| Reservation Scheduler | `/booking.html` | Date selection, availability validation, and rental calculations |
-| Itemized Invoicing | `/billing.html`, `/payment.html` | Invoice breakdown and simulated payment workflow |
-| Administrative Dashboard | `/admin-dashboard.html` | Operational statistics and Chart.js visualizations |
-| Return Management | `/return-management.html` | Return inspection, overdue fees, damage assessment, and deposit settlement |
+| Interface | Suggested Screenshot |
+|---|---|
+| Customer Marketplace | `marketplace.png` |
+| Booking Scheduler | `booking.png` |
+| Invoice and Payment | `invoicing.png` |
+| Administrative Dashboard | `admin-dashboard.png` |
+| Return Management | `return-management.png` |
 
-### Adding Application Screenshots
-
-To make the repository more visually informative, capture screenshots while the application is running locally.
-
-Store screenshots in:
-
-```text
-docs/
-└── screenshots/
-    ├── marketplace.png
-    ├── booking.png
-    ├── invoicing.png
-    ├── admin-dashboard.png
-    └── return-management.png
-```
-
-Once the screenshots are added, they can be displayed in this section using standard Markdown image links.
-
-For example:
+Example:
 
 ```markdown
 ![Customer Marketplace](docs/screenshots/marketplace.png)
@@ -278,64 +463,31 @@ For example:
 
 ## Database Design
 
-The relational database is implemented using MySQL 8.0 and the InnoDB storage engine.
+The system uses MySQL with the InnoDB storage engine.
 
-The schema uses separate tables for authentication, customers, rental inventory, category-specific attributes, bookings, invoices, payments, returns, and activity logs.
-
-### Entity Relationship Overview
-
-```text
-+---------------+        1:N        +-------------------+
-|     users     | ----------------> |     bookings      |
-+---------------+                   +-------------------+
-       |                                      |
-      1:1                                     1:1
-       |                                      |
-+---------------+                   +-------------------+
-|   customers   |                   |     invoices      |
-+---------------+                   +-------------------+
-                                              |
-                                             1:N
-                                              |
-                                    +-------------------+
-                                    |     payments      |
-                                    +-------------------+
-                                              |
-                                             1:1
-                                              |
-                                    +-------------------+
-                                    |      returns      |
-                                    +-------------------+
-
-+---------------+        1:N
-|  rental_items | ----------------> Category Subtype Tables
-+---------------+                    cars
-                                     bikes
-                                     houses
-                                     furniture
-```
+Its relational schema separates authentication, customer information, rental inventory, category-specific attributes, bookings, invoices, payments, returns, and activity logs.
 
 ### Relational Schema Summary
 
-The project database contains 13 relational tables according to the supplied schema documentation.
+The documented schema contains 13 relational tables.
 
 | Table | Purpose |
 |---|---|
 | `users` | Authentication records, password hashes, roles, and account status |
-| `admins` | Administrator profiles and departmental information |
-| `customers` | Customer contact information and addresses |
+| `admins` | Administrator profiles |
+| `customers` | Customer contact information |
 | `rental_items` | Common rental catalog metadata |
 | `cars` | Automotive specifications |
 | `bikes` | Motorcycle specifications |
 | `houses` | Residential property specifications |
 | `furniture` | Furniture specifications |
-| `bookings` | Reservation dates, pricing, discounts, deposits, and status |
-| `payments` | Payment transaction references, methods, amounts, and status |
+| `bookings` | Reservation dates, pricing, deposits, and status |
+| `payments` | Payment references, methods, amounts, and status |
 | `invoices` | Itemized billing information |
-| `returns` | Return inspection and settlement records |
-| `activity_logs` | Records of important system actions |
+| `returns` | Return inspections and settlement records |
+| `activity_logs` | Important system activity records |
 
-For the complete entity relationship diagram and field specifications, see:
+For complete database details, refer to:
 
 [Database Design Documentation](database/DATABASE_DESIGN.md)
 
@@ -343,74 +495,74 @@ For the complete entity relationship diagram and field specifications, see:
 
 ## Security Implementation
 
-Security is implemented across authentication, session handling, authorization, database operations, and frontend input rendering.
+Security-related functionality is implemented across authentication, session management, authorization, database operations, and frontend input handling.
 
-### 1. Password Hashing and Key Derivation
+### Authentication and Password Handling
 
-- Passwords are hashed using PBKDF2-HMAC-SHA256 with 600,000 iterations and unique 16-byte cryptographically secure salts.
-- Key derivation and salt generation use the Windows Cryptography API: Next Generation.
-- Relevant functions include `BCryptDeriveKeyPBKDF2` and `BCryptGenRandom`.
-- Password verification uses constant-time comparison through `PasswordHasher::constantTimeCompare`.
-- A migration mechanism upgrades legacy password hashes following successful authentication.
+The authentication implementation includes password hashing, cryptographic salt generation, and password verification.
 
-### 2. Session Management and IDOR Protection
+The project has platform-specific cryptographic dependencies. The exact password-hashing algorithm used by each build should be reviewed against the corresponding implementation before describing its security guarantees.
 
-- Sessions use cryptographically secure random tokens containing 256 bits of random data.
-- Tokens use the format `SRMS-<64-hex-characters>`.
-- A 24-hour session expiration period is enforced on protected endpoints.
-- Active tokens are invalidated upon logout.
-- Customer authorization checks restrict access to their own bookings, invoices, and payments.
+### Session Management
 
-### 3. Concurrency Safety and Double-Booking Prevention
+- Session tokens are generated for authenticated users.
+- Protected endpoints validate session information.
+- Logout invalidates the active session.
+- Customer authorization checks restrict access to their own records.
 
-- Booking requests use an exclusive `std::recursive_mutex` and an RAII `TransactionGuard`.
-- Availability is checked inside a database transaction.
-- Overlapping booking requests are rejected with HTTP 409 Conflict when a conflicting reservation exists.
+### Authorization and IDOR Protection
 
-### 4. Input Sanitization and Network Hardening
+- Customer and administrator permissions are separated.
+- Protected booking and invoice operations validate ownership.
+- Administrative endpoints require administrator authorization.
 
-- Database operations use SQL input handling and parameterized statements where implemented.
-- The `escapeHtml` utility escapes dynamic user input before rendering it into DOM elements.
-- CORS handling validates request origins against an explicitly trusted list.
-- Untrusted preflight `OPTIONS` requests are rejected with HTTP 403 Forbidden.
-- Responses omit `Access-Control-Allow-Origin` when the requesting origin is not trusted.
+### Database Security
+
+- Parameterized SQL operations are used where implemented.
+- Database credentials are configured separately from application source code.
+- Cloud database connectivity uses TLS/SSL where configured.
+
+### Input and Network Handling
+
+- Dynamic frontend content is escaped before DOM insertion using the project's HTML escaping utility.
+- CORS handling validates request origins against the configured trusted list.
+- API endpoints enforce authentication and authorization where required.
+
+> Security features should be evaluated against the actual implementation and deployment configuration. This project is intended as an educational and portfolio application, not as a certified production security system.
 
 ---
 
 ## Testing and Verification
 
-The project includes standalone C++ unit tests and Python-based live integration and concurrency test scripts.
+The project includes C++ unit tests and Python-based integration and concurrency testing.
 
-### 1. Standalone C++ Unit Test Suite
+### 1. C++ Unit Tests
 
-The C++ test runner covers business logic and core programming concepts without requiring a live database.
+The standalone C++ test runner covers core business logic and programming concepts.
 
 Run:
 
 ```powershell
-$env:PATH = "C:\Program Files\MySQL\MySQL Server 8.0\lib;$env:PATH"
 .\build\run_tests.exe
 ```
 
-The supplied test report identifies coverage for:
+Documented test areas include:
 
 | Test Area | Description |
 |---|---|
-| Password Hashing | PBKDF2-HMAC-SHA256 password hashing |
-| Polymorphism | Polymorphic rental calculations and factory pattern |
+| Password Handling | Password hashing and verification |
+| Polymorphism | Polymorphic rental calculations |
 | Operator Overloading | Custom comparison operators |
-| Friend Functions | Rental value comparison and stream insertion |
+| Friend Functions | Rental value comparison |
 | Templates | Generic repository implementation |
-| Return Settlement | Overdue days, late fees, and deposit refunds |
-| Exception Handling | Error handling and input validation |
-| Date Validation | Booking interval overlap detection |
-| Billing | Tiered discounts and billing calculations |
+| Return Settlement | Overdue fees and deposit calculations |
+| Exception Handling | Error handling and validation |
+| Date Validation | Booking interval overlap |
+| Billing | Discounts and billing calculations |
 
-The previously supplied test output reports **9/9 tests passed**.
+### 2. Live Integration and E2E Tests
 
-### 2. Live Automated E2E and Concurrency Tests
-
-The Python test runner starts the C++ server, checks API behavior, executes the booking lifecycle, and tests concurrent reservation requests.
+The Python test runner starts the backend and verifies API behavior and rental workflows.
 
 Run:
 
@@ -418,33 +570,32 @@ Run:
 python tests/run_all_live_tests.py
 ```
 
-The supplied test report covers:
+The documented test coverage includes:
 
-- Server health check.
+- Server health checks.
 - Administrator and customer authentication.
-- Authorization barriers for administrator endpoints.
+- Authorization checks.
 - Booking date validation.
 - Booking creation.
-- Double-booking collision prevention.
-- Invoice authentication and ownership checks.
+- Invoice ownership checks.
 - Payment authorization.
 - Return settlement.
-- Rental item availability restoration.
+- Inventory availability restoration.
 - CORS origin validation.
 - Concurrent booking requests.
 
-### 3. Concurrency Test
+### 3. Concurrency Testing
 
-The supplied concurrency test report describes 10 simultaneous booking requests for the same rental item and overlapping date window.
+The concurrency test script evaluates simultaneous booking requests for the same rental item and overlapping date window.
 
-Reported results:
+Previously supplied test results reported:
 
 | HTTP Status | Meaning | Count |
 |---|---|---:|
 | 201 | Reservation created | 1 |
 | 409 | Reservation conflict | 9 |
 
-This demonstrates the intended behavior: only one reservation succeeds while conflicting requests are rejected.
+These results should be retained as verified test results only when the corresponding test run is available.
 
 ---
 
@@ -494,11 +645,13 @@ SmartRentalManagement/
 ├── database/
 │   ├── schema.sql
 │   ├── seed.sql
+│   ├── cloud_init.sql
 │   └── DATABASE_DESIGN.md
 │
 ├── docs/
 │   ├── API_DOCUMENTATION.md
-│   └── OOP_CONCEPTS.md
+│   ├── OOP_CONCEPTS.md
+│   └── screenshots/
 │
 ├── frontend/
 │   ├── css/
@@ -507,12 +660,18 @@ SmartRentalManagement/
 │   │   └── api.js
 │   └── *.html
 │
+├── scripts/
+│   └── import_to_aiven.ps1
+│
 ├── tests/
 │   ├── test_main.cpp
 │   ├── test_api_suite.py
 │   ├── test_concurrency_double_booking.py
 │   └── run_all_live_tests.py
 │
+├── Dockerfile
+├── docker-entrypoint.sh
+├── .dockerignore
 ├── CMakeLists.txt
 └── README.md
 ```
@@ -521,33 +680,34 @@ SmartRentalManagement/
 
 ## Prerequisites
 
-The documented build environment targets Windows.
+The local development environment targets Windows.
 
-Ensure the following software is installed:
+| Tool | Recommended Version |
+|---|---|
+| C++ Compiler | GCC 11+ / MinGW-w64 |
+| CMake | 3.15+ |
+| Ninja | 1.10+ |
+| MySQL Server | 8.0+ |
+| MySQL C Client Library | Compatible with installed MySQL version |
+| Python | 3.8+ (for automated testing) |
+| Docker Desktop | Current supported version |
 
-| Tool | Recommended Version | Verification Command |
-|---|---|---|
-| C++ Compiler | GCC 11+ / MinGW-w64 | `g++ --version` |
-| CMake | 3.15+ | `cmake --version` |
-| Ninja | 1.10+ | `ninja --version` |
-| MySQL Server | 8.0 | `mysql --version` |
-| MySQL C Client Library | Compatible with MySQL 8.0 | Verify installed headers and libraries |
-| Python (optional) | 3.8+ | `python --version` |
+Verify installations:
 
-The MySQL headers and libraries are expected in locations such as:
-
-```text
-C:\Program Files\MySQL\MySQL Server 8.0\include
-C:\Program Files\MySQL\MySQL Server 8.0\lib
+```powershell
+g++ --version
+cmake --version
+ninja --version
+mysql --version
+python --version
+docker --version
 ```
 
 ---
 
-## Installation and Setup
+## Local Installation
 
 ### 1. Clone the Repository
-
-Open Windows PowerShell and run:
 
 ```powershell
 git clone https://github.com/sharadkadam21242124-a11y/Smart-Rental-Management-System.git
@@ -555,15 +715,13 @@ git clone https://github.com/sharadkadam21242124-a11y/Smart-Rental-Management-Sy
 cd Smart-Rental-Management-System
 ```
 
-### 2. Verify MySQL Service Status
-
-Check whether the MySQL service is running:
+### 2. Verify MySQL Service
 
 ```powershell
 Get-Service -Name MySQL*
 ```
 
-If the service is stopped, start it from an elevated PowerShell terminal:
+If your MySQL service is stopped, start it from an elevated PowerShell terminal:
 
 ```powershell
 Start-Service -Name MySQL80
@@ -573,35 +731,32 @@ Start-Service -Name MySQL80
 
 ## Database Configuration
 
-### 1. Initialize the Database
+The application supports local MySQL and managed cloud MySQL configurations.
 
-Log in to your local MySQL server:
+### Option A: Local MySQL
+
+Log in:
 
 ```powershell
 mysql -u root -p
 ```
 
-After entering the MySQL password, execute the initialization scripts from the project root directory:
+Initialize the database:
 
 ```sql
 SOURCE database/schema.sql;
-
 SOURCE database/seed.sql;
 ```
 
-The schema script creates the database structure, and the seed script inserts initial demonstration data.
-
-### 2. Configure Database Credentials
-
-Copy the example configuration file:
+Create the local configuration:
 
 ```powershell
 Copy-Item config/database.example.json config/database.json
 ```
 
-Open `config/database.json` and update the credentials for your local MySQL environment.
+Update the database credentials in `config/database.json`.
 
-Example configuration:
+Example:
 
 ```json
 {
@@ -615,161 +770,246 @@ Example configuration:
 }
 ```
 
-**Security Note:** The local `config/database.json` file should be excluded through `.gitignore`. Never commit real database credentials or passwords to GitHub.
+### Option B: Aiven Cloud MySQL
+
+The deployed application uses Aiven-managed MySQL connectivity.
+
+To configure another cloud environment:
+
+1. Create a compatible MySQL service.
+2. Initialize the required database schema.
+3. Import the required seed or demonstration data.
+4. Obtain the database connection details.
+5. Configure the application's environment variables.
+6. Enable the database TLS/SSL settings required by the provider.
+
+Example environment variables:
+
+```text
+DB_HOST=your-mysql-host
+DB_PORT=your-mysql-port
+DB_NAME=your-database-name
+DB_USER=your-database-user
+DB_PASSWORD=your-database-password
+```
+
+**Never commit real database passwords, connection strings, or private certificates to GitHub.**
 
 ---
 
-## Build Instructions
+## Docker Setup
 
-Execute these commands in Windows PowerShell from the project root directory.
+The project includes a multi-stage Dockerfile for building and running the application in a containerized environment.
 
-### 1. Configure Environment Paths
+### 1. Build the Docker Image
 
-Update the paths according to your local MinGW and MySQL installations:
+From the project root:
 
-```powershell
-$env:PATH = "C:\mingw64\mingw64\bin;C:\Program Files\MySQL\MySQL Server 8.0\lib;$env:PATH"
+```bash
+docker build -t smart-rental-management .
 ```
 
-### 2. Configure CMake
+### 2. Run the Container
+
+Configure the required database variables with your own cloud database credentials:
 
 ```powershell
-cmake -B build -S . -G "Ninja"
+docker run -d `
+  --name smart-rental-management `
+  -p 8080:8080 `
+  -e PORT=8080 `
+  -e DB_HOST="your-mysql-host" `
+  -e DB_PORT="your-mysql-port" `
+  -e DB_NAME="your-database-name" `
+  -e DB_USER="your-database-user" `
+  -e DB_PASSWORD="your-database-password" `
+  smart-rental-management
 ```
 
-### 3. Compile the Application
+View container logs:
 
 ```powershell
-cmake --build build
+docker logs -f smart-rental-management
 ```
 
-The build is expected to generate:
+Stop the container:
 
-| Executable | Purpose |
-|---|---|
-| `build/SmartRentalManagement.exe` | Backend server and frontend web host |
-| `build/run_tests.exe` | Standalone C++ unit test runner |
+```powershell
+docker stop smart-rental-management
+```
+
+Remove the container:
+
+```powershell
+docker rm smart-rental-management
+```
 
 ---
 
-## How to Run
+## Cloud Deployment
 
-Ensure the MySQL client library, including `libmysql.dll`, is accessible through your environment's `PATH`.
+The application is deployed using the following services:
 
-From the project root directory, execute:
+### Render
+
+Render hosts the Dockerized C++ application.
+
+Deployment workflow:
+
+1. Connect the GitHub repository to Render.
+2. Create a Web Service.
+3. Select Docker as the runtime.
+4. Configure the required environment variables.
+5. Deploy the application.
+6. Verify the application through its public HTTPS URL.
+
+### Aiven
+
+Aiven provides the managed MySQL database.
+
+Deployment workflow:
+
+1. Create a MySQL service.
+2. Initialize the database schema.
+3. Import the required application data.
+4. Configure secure database connectivity.
+5. Add the database connection details to the Render environment configuration.
+6. Verify backend database connectivity.
+
+### Production Configuration
+
+The deployment should use environment-based configuration for:
+
+- Application port.
+- Database host.
+- Database port.
+- Database name.
+- Database username.
+- Database password.
+- TLS/SSL configuration.
+
+The deployed service should never rely on credentials committed to the public GitHub repository.
+
+**Live Application:** [https://smart-rental-management-system-gxri.onrender.com](https://smart-rental-management-system-gxri.onrender.com)
+
+---
+
+## Running Locally
+
+Ensure the MySQL service is running and the local database configuration is correct.
+
+Configure the MySQL runtime library path if required:
 
 ```powershell
 $env:PATH = "C:\Program Files\MySQL\MySQL Server 8.0\lib;$env:PATH"
+```
 
+Start the application:
+
+```powershell
 .\build\SmartRentalManagement.exe
 ```
 
-The application should connect to MySQL, serve static frontend assets from `./frontend`, and listen on port 8080.
+Open the application:
 
-Open your browser and visit:
-
-**[http://localhost:8080](http://localhost:8080)**
+[http://localhost:8080](http://localhost:8080)
 
 Keep the terminal running while using the application.
 
 ---
 
-## Demo Credentials
-
-The database seed script is documented as initializing the following demonstration accounts:
-
-| Role | Email / Username | Password |
-|---|---|---|
-| Administrator | `admin@smartrental.com` | `Password@123` |
-| Customer | `aarav.sharma@gmail.com` | `Password@123` |
-| Customer | `priya.patel@gmail.com` | `Password@123` |
-
-### Access Scope
-
-- **Administrator:** Fleet inventory, customer management, booking controls, return settlements, and revenue reports.
-- **Customer:** Catalog browsing, booking scheduling, invoice review, simulated payments, and profile management.
-
-**Security Warning:** These credentials are intended only for local development and demonstration. Replace or remove demonstration accounts before deploying the application in any publicly accessible environment.
-
----
-
 ## API Documentation
 
-The backend exposes JSON REST API endpoints under the `/api` route.
-
-The following table summarizes key endpoints:
+The backend exposes REST API endpoints under `/api`.
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `GET` | `/api/health` | Public | Checks system and database connectivity |
-| `POST` | `/api/login` | Public | Authenticates users and returns a session token |
-| `POST` | `/api/register` | Public | Registers a customer account |
-| `POST` | `/api/logout` | Authenticated | Invalidates the active session |
-| `GET` | `/api/items` | Public | Retrieves rental items with filters |
-| `GET` | `/api/items/:id` | Public | Retrieves details for a rental item |
-| `GET` | `/api/availability` | Public | Checks rental availability for a date window |
-| `GET` | `/api/bookings` | Authenticated | Retrieves customer bookings or all bookings for administrators |
-| `POST` | `/api/bookings` | Customer | Creates a booking reservation |
-| `PUT` | `/api/bookings/:id/cancel` | Customer / Admin | Cancels an eligible reservation |
-| `GET` | `/api/invoices/:id` | Authenticated | Retrieves an itemized invoice |
-| `POST` | `/api/payments` | Authenticated | Records a simulated payment |
-| `POST` | `/api/returns` | Admin | Processes a rental return settlement |
-| `GET` | `/api/admin/dashboard` | Admin | Retrieves dashboard statistics |
-| `GET` | `/api/reports/export/:type` | Admin | Exports administrative CSV reports |
+| GET | `/api/health` | Public | Checks application health |
+| POST | `/api/login` | Public | Authenticates users |
+| POST | `/api/register` | Public | Registers a customer |
+| POST | `/api/logout` | Authenticated | Invalidates the active session |
+| GET | `/api/items` | Public | Retrieves rental items |
+| GET | `/api/items/:id` | Public | Retrieves rental item details |
+| GET | `/api/availability` | Public | Checks rental availability |
+| GET | `/api/bookings` | Authenticated | Retrieves bookings |
+| POST | `/api/bookings` | Customer | Creates a reservation |
+| PUT | `/api/bookings/:id/cancel` | Customer / Admin | Cancels an eligible booking |
+| GET | `/api/invoices/:id` | Authenticated | Retrieves an invoice |
+| POST | `/api/payments` | Authenticated | Records a simulated payment |
+| POST | `/api/returns` | Admin | Processes a return settlement |
+| GET | `/api/admin/dashboard` | Admin | Retrieves dashboard analytics |
+| GET | `/api/reports/export/:type` | Admin | Exports CSV reports |
 
-For complete request payloads, response structures, and error codes, refer to:
+For detailed request payloads, response structures, and error handling, refer to:
 
 [API Documentation](docs/API_DOCUMENTATION.md)
 
 ---
 
+## Demo Access
+
+The application supports customer and administrator workflows.
+
+For security reasons, public administrator passwords and production database credentials are not published in this repository.
+
+Use designated demonstration accounts only when they have been configured for public access.
+
+**Important:** Do not use real personal accounts, production credentials, or sensitive customer information for public demonstrations.
+
+---
+
 ## Known Limitations
 
-The current implementation has the following documented limitations:
+1. **Simulated Payments:** Payment operations demonstrate transaction workflows without connecting to real banking or payment gateway services.
 
-1. **Simulated Payment Processing:** Payment handling is intended for demonstration. It records payment methods and transaction references without communicating with external banking gateways.
+2. **In-Memory Sessions:** Session storage is maintained by the application process. A distributed deployment would benefit from centralized session storage.
 
-2. **Windows CNG Cryptography:** Password hashing and cryptographic random generation rely on the Windows Cryptography API. Cross-platform support would require an abstraction using a portable cryptography library such as OpenSSL or libsodium.
+3. **Database Synchronization:** Shared database connection synchronization can limit throughput under high concurrent workloads. A production-scale implementation would benefit from a properly managed connection pool.
 
-3. **In-Memory Session Store:** Active sessions are stored in server process memory. Multiple backend instances would require a shared session store, such as Redis.
+4. **Cloud Hosting Constraints:** Application availability and response time depend on the selected hosting plan and provider resource limits.
 
-4. **Single Connection Synchronization:** Database operations share a connection handle protected through `std::recursive_mutex`. Higher-concurrency workloads would benefit from a properly implemented multi-connection pool.
+5. **Platform-Specific Dependencies:** Cryptographic implementation and build dependencies must be verified for each supported operating system.
 
 ---
 
 ## Future Improvements
 
-Potential enhancements for future development include:
+Potential enhancements include:
 
-- [ ] **Cross-Platform Cryptography:** Implement a portable cryptography provider for Linux and macOS.
-- [ ] **Real Payment Gateway Integration:** Integrate payment providers such as Razorpay or Stripe with secure webhook handling.
-- [ ] **Containerization:** Add Docker and Docker Compose configurations for the backend and MySQL service.
-- [ ] **Automated Email Notifications:** Send booking confirmations, invoices, and return settlement notifications.
-- [ ] **Distributed Session Storage:** Add Redis-backed session persistence for multi-instance deployments.
-- [ ] **Enhanced Monitoring:** Add structured logging, performance metrics, and centralized error monitoring.
-- [ ] **Deployment Automation:** Introduce CI workflows for automated builds and testing.
+- [ ] Integrate Razorpay or Stripe for real payment processing.
+- [ ] Add secure webhook verification for payment events.
+- [ ] Implement automated email notifications.
+- [ ] Add Redis-backed distributed session storage.
+- [ ] Introduce a scalable database connection pool.
+- [ ] Improve structured logging and application monitoring.
+- [ ] Add CI/CD workflows for automated builds and testing.
+- [ ] Add more detailed reporting and analytics.
+- [ ] Improve deployment automation and infrastructure configuration.
+- [ ] Expand automated security and performance testing.
 
 ---
 
 ## Learning Outcomes
 
-This project provides practical exposure to several software engineering concepts.
+This project provided practical experience with multiple software engineering concepts.
 
 ### C++17 Programming
 
-- Modern C++ standard library features.
-- Object-oriented programming and polymorphism.
+- Object-oriented programming.
+- Polymorphism and inheritance.
 - Smart pointers and resource management.
 - Templates and operator overloading.
-- Exception handling and custom exceptions.
+- Exception handling.
+- RAII-based programming.
 
 ### Database Engineering
 
-- Relational database design and normalization.
+- Relational database design.
 - MySQL schema implementation.
-- Foreign key relationships and constraints.
-- Transaction management and consistency.
-- SQL queries and prepared statements.
+- Foreign keys and referential integrity.
+- Transaction management.
+- Prepared SQL statements.
+- Data consistency.
 
 ### Backend Development
 
@@ -777,22 +1017,24 @@ This project provides practical exposure to several software engineering concept
 - HTTP request and response handling.
 - Authentication and authorization.
 - Business logic separation.
-- Thread synchronization and concurrency handling.
+- Thread synchronization.
+- Concurrency-aware operations.
 
 ### Full-Stack Development
 
 - HTML, CSS, and JavaScript integration.
-- Asynchronous frontend API communication.
+- Asynchronous API communication.
 - Responsive interface development.
-- Dashboard visualization with Chart.js.
+- Dashboard visualization using Chart.js.
+- Frontend and backend integration.
 
-### Software Engineering Practices
+### Cloud and DevOps
 
-- Layered architecture.
-- RAII-based resource management.
-- Unit and integration testing.
-- Security-conscious application design.
-- Git and GitHub project management.
+- Docker containerization.
+- Cloud application deployment.
+- Managed MySQL database integration.
+- Environment-based configuration.
+- Git and GitHub workflows.
 
 ---
 
@@ -800,8 +1042,16 @@ This project provides practical exposure to several software engineering concept
 
 A formal open-source license has not yet been added to this repository.
 
-The project is currently provided for evaluation, portfolio review, and educational demonstration purposes. For reuse, redistribution, or commercial inquiries, contact the repository owner or open an issue.
+The project is currently shared for portfolio review, educational demonstration, and evaluation purposes. Contact the repository owner for questions regarding reuse or redistribution.
 
 ---
 
-**Developed as a software engineering project demonstrating modern C++ backend development, relational database management, REST API design, and full-stack application integration.**
+<p align="center">
+  <strong>Smart Rental Management System</strong>
+  <br>
+  Built with C++17, MySQL, Docker, and modern web technologies.
+  <br>
+  <a href="https://smart-rental-management-system-gxri.onrender.com">Live Application</a>
+  |
+  <a href="https://github.com/sharadkadam21242124-a11y/Smart-Rental-Management-System">GitHub Repository</a>
+</p>

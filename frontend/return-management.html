@@ -185,10 +185,10 @@
         } else {
           tbody.innerHTML = activeBookingsForReturn.map(b => `
             <tr>
-              <td><strong class="font-monospace text-primary">${b.booking_code}</strong></td>
-              <td>${b.customer_name || 'Customer #' + b.customer_id}</td>
-              <td><strong class="text-dark">${b.item_title}</strong></td>
-              <td><span class="badge badge-category position-static badge-${b.category || 'Car'} py-0 px-2">${b.category}</span></td>
+              <td><strong class="font-monospace text-primary">${escapeHtml(b.booking_code)}</strong></td>
+              <td>${escapeHtml(b.customer_name || 'Customer #' + b.customer_id)}</td>
+              <td><strong class="text-dark">${escapeHtml(b.item_title)}</strong></td>
+              <td><span class="badge badge-category position-static badge-${escapeHtml(b.category || 'Car')} py-0 px-2">${escapeHtml(b.category)}</span></td>
               <td>${formatDate(b.end_date)}</td>
               <td><strong>${formatCurrency(b.security_deposit)}</strong></td>
               <td>
@@ -214,14 +214,14 @@
         } else {
           rTbody.innerHTML = returns.map(r => `
             <tr>
-              <td><strong class="font-monospace text-dark">${r.return_code}</strong></td>
-              <td><span class="font-monospace text-primary">${r.booking_code}</span></td>
-              <td>${r.item_title}</td>
+              <td><strong class="font-monospace text-dark">${escapeHtml(r.return_code)}</strong></td>
+              <td><span class="font-monospace text-primary">${escapeHtml(r.booking_code)}</span></td>
+              <td>${escapeHtml(r.item_title)}</td>
               <td>${formatDate(r.actual_return_date)}</td>
               <td>${r.overdue_days > 0 ? `<span class="badge bg-danger">${r.overdue_days} d late</span>` : 'On Time'}</td>
               <td class="text-danger">${formatCurrency(r.total_late_fee)}</td>
               <td class="text-danger">${formatCurrency(r.damage_charges)}</td>
-              <td><span class="badge bg-light text-dark border">${r.item_condition}</span></td>
+              <td><span class="badge bg-light text-dark border">${escapeHtml(r.item_condition)}</span></td>
               <td><strong class="text-success">${formatCurrency(r.deposit_refunded)}</strong></td>
             </tr>
           `).join('');

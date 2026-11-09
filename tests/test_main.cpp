@@ -41,24 +41,33 @@ int g_totalTests = 0;
 
 // 1. Password Hashing Test
 void testPasswordHashing() {
-    TEST_CASE("Password Hashing & CSPRNG Salted Security");
+    TEST_CASE("Password Hashing & PBKDF2-HMAC-SHA256 (600,000 Rounds OWASP)");
     std::string plain = "Password@123";
     
-    // Test pure SHA-256
+    // Test pure legacy SHA-256
     std::string rawHash = PasswordHasher::sha256(plain);
     ASSERT_TRUE(!rawHash.empty(), "Hash should not be empty");
     ASSERT_TRUE(rawHash.length() == 64, "SHA-256 output must be 64 hex characters");
     ASSERT_TRUE(PasswordHasher::verifyPassword(plain, rawHash), "Legacy SHA-256 password verification failed");
     ASSERT_TRUE(!PasswordHasher::verifyPassword("WrongPassword", rawHash), "Wrong password should fail");
+    ASSERT_TRUE(PasswordHasher::isLegacyHash(rawHash), "Raw SHA-256 must be identified as legacy hash for migration");
 
-    // Test modern CSPRNG salted hash
-    std::string saltedHash1 = PasswordHasher::hashPassword(plain);
-    std::string saltedHash2 = PasswordHasher::hashPassword(plain);
-    ASSERT_TRUE(saltedHash1.rfind("SALTED$", 0) == 0, "Salted hash format must start with SALTED$");
-    ASSERT_TRUE(saltedHash1 != saltedHash2, "Different salts must produce different hash strings for same password");
-    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, saltedHash1), "Salted password verification failed");
-    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, saltedHash2), "Salted password verification failed for second hash");
-    ASSERT_TRUE(!PasswordHasher::verifyPassword("WrongPass@123", saltedHash1), "Salted verify must reject incorrect password");
+    // Test modern OWASP recommended PBKDF2-HMAC-SHA256 (600,000 iterations)
+    std::string pbkdf2Hash1 = PasswordHasher::hashPassword(plain);
+    std::string pbkdf2Hash2 = PasswordHasher::hashPassword(plain);
+    ASSERT_TRUE(pbkdf2Hash1.rfind("PBKDF2$600000$", 0) == 0, "Modern hash format must start with PBKDF2$600000$");
+    ASSERT_TRUE(!PasswordHasher::isLegacyHash(pbkdf2Hash1), "PBKDF2 600,000 iterations hash should not be identified as legacy");
+    ASSERT_TRUE(pbkdf2Hash1 != pbkdf2Hash2, "Different salts must produce different hash strings for same password");
+    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, pbkdf2Hash1), "PBKDF2 password verification failed");
+    ASSERT_TRUE(PasswordHasher::verifyPassword(plain, pbkdf2Hash2), "PBKDF2 password verification failed for second hash");
+    ASSERT_TRUE(!PasswordHasher::verifyPassword("WrongPass@123", pbkdf2Hash1), "PBKDF2 verify must reject incorrect password");
+
+    // Test backward-compatibility for older iteration counts (e.g. 100,000 rounds)
+    // It must verify correctly, but isLegacyHash must return true so it upgrades on next login
+    std::string oldFormatHash = "PBKDF2$100000$abcd1234efgh5678$0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+    ASSERT_TRUE(PasswordHasher::isLegacyHash(oldFormatHash), "PBKDF2 with <600,000 rounds must qualify for work-factor upgrade");
+    std::string futureFormatHash = "PBKDF2$800000$abcd1234efgh5678$0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+    ASSERT_TRUE(!PasswordHasher::isLegacyHash(futureFormatHash), "PBKDF2 with >=600,000 rounds must not be downgraded or re-upgraded");
 
     // Test constant time comparison
     ASSERT_TRUE(PasswordHasher::constantTimeCompare("secret123", "secret123"), "Constant time compare should succeed for identical strings");

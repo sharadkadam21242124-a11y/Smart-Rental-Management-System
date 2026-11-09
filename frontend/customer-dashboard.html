@@ -220,11 +220,11 @@
         const recent = bookings.slice(0, 5);
         tbody.innerHTML = recent.map(b => `
           <tr>
-            <td><strong class="font-monospace text-primary">${b.booking_code}</strong></td>
+            <td><strong class="font-monospace text-primary">${escapeHtml(b.booking_code)}</strong></td>
             <td>
-              <div class="fw-semibold">${b.item_title || 'Item #' + b.item_id}</div>
+              <div class="fw-semibold">${escapeHtml(b.item_title || 'Item #' + b.item_id)}</div>
             </td>
-            <td><span class="badge badge-category position-static badge-${b.category || 'Car'}">${b.category || 'General'}</span></td>
+            <td><span class="badge badge-category position-static badge-${escapeHtml(b.category || 'Car')}">${escapeHtml(b.category || 'General')}</span></td>
             <td class="small text-muted">${formatDate(b.start_date)} to ${formatDate(b.end_date)}</td>
             <td>${b.rental_days} d</td>
             <td><strong>${formatCurrency(b.total_amount)}</strong></td>

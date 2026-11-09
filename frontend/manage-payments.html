@@ -117,15 +117,15 @@
 
       tbody.innerHTML = items.map(p => `
         <tr>
-          <td><strong class="font-monospace text-dark">${p.transaction_id}</strong></td>
-          <td><strong class="text-dark">${p.customer_name || 'Customer #' + p.customer_id}</strong></td>
-          <td><span class="font-monospace text-primary">${p.booking_code || '-'}</span></td>
-          <td><span class="badge bg-light text-dark border">${p.payment_method}</span></td>
-          <td><span class="badge ${p.payment_type === 'Deposit Refund' ? 'bg-info text-dark' : 'bg-primary'}">${p.payment_type}</span></td>
+          <td><strong class="font-monospace text-dark">${escapeHtml(p.transaction_id)}</strong></td>
+          <td><strong class="text-dark">${escapeHtml(p.customer_name || 'Customer #' + p.customer_id)}</strong></td>
+          <td><span class="font-monospace text-primary">${escapeHtml(p.booking_code || '-')}</span></td>
+          <td><span class="badge bg-light text-dark border">${escapeHtml(p.payment_method)}</span></td>
+          <td><span class="badge ${p.payment_type === 'Deposit Refund' ? 'bg-info text-dark' : 'bg-primary'}">${escapeHtml(p.payment_type)}</span></td>
           <td><strong class="${p.payment_type === 'Deposit Refund' ? 'text-success' : 'text-dark'}">${formatCurrency(p.amount)}</strong></td>
-          <td><span class="badge ${p.payment_status === 'refunded' ? 'bg-info text-dark' : 'bg-success'} text-capitalize">${p.payment_status}</span></td>
+          <td><span class="badge ${p.payment_status === 'refunded' ? 'bg-info text-dark' : 'bg-success'} text-capitalize">${escapeHtml(p.payment_status)}</span></td>
           <td class="small text-muted">${formatDate(p.payment_date)}</td>
-          <td class="small text-muted">${p.remarks || '-'}</td>
+          <td class="small text-muted">${escapeHtml(p.remarks || '-')}</td>
         </tr>
       `).join('');
     }

@@ -13,7 +13,8 @@ USE smart_rental_db;
 
 -- 2. Create Application Database User with Least-Privilege Access
 -- (Avoid using the root user for application backend operations)
-CREATE USER IF NOT EXISTS 'rental_user'@'localhost' IDENTIFIED BY 'RentalUser@2026';
+-- Replace '<YOUR_SECURE_PASSWORD>' with your environment's password matching config/database.json
+CREATE USER IF NOT EXISTS 'rental_user'@'localhost' IDENTIFIED BY '<YOUR_SECURE_PASSWORD>';
 GRANT SELECT, INSERT, UPDATE, DELETE ON smart_rental_db.* TO 'rental_user'@'localhost';
 FLUSH PRIVILEGES;
 

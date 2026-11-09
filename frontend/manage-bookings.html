@@ -117,13 +117,13 @@
 
       tbody.innerHTML = items.map(b => `
         <tr>
-          <td><strong class="font-monospace text-primary">${b.booking_code}</strong></td>
+          <td><strong class="font-monospace text-primary">${escapeHtml(b.booking_code)}</strong></td>
           <td>
-            <div class="fw-semibold">${b.customer_name || 'Customer #' + b.customer_id}</div>
+            <div class="fw-semibold">${escapeHtml(b.customer_name || 'Customer #' + b.customer_id)}</div>
           </td>
           <td>
-            <strong class="text-dark">${b.item_title}</strong>
-            <div><span class="badge badge-category position-static badge-${b.category || 'Car'} py-0 px-2" style="font-size: 0.7rem;">${b.category}</span></div>
+            <strong class="text-dark">${escapeHtml(b.item_title)}</strong>
+            <div><span class="badge badge-category position-static badge-${escapeHtml(b.category || 'Car')} py-0 px-2" style="font-size: 0.7rem;">${escapeHtml(b.category)}</span></div>
           </td>
           <td class="small text-muted">${formatDate(b.start_date)} to ${formatDate(b.end_date)}</td>
           <td>${b.rental_days} d</td>

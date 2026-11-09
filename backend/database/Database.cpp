@@ -119,12 +119,18 @@ void Database::loadConfigFromFile(const std::string& configFilePath) {
     std::string pass = JsonHelper::extractString(content, "password");
     if (!pass.empty()) cfg.password = pass;
 
+    const char* envPass = std::getenv("DB_PASSWORD");
+    if (!envPass) envPass = std::getenv("MYSQL_PASSWORD");
+    if (cfg.password.empty() && envPass) {
+        cfg.password = envPass;
+    }
+
     initialize(cfg);
     Logger::info("Database configuration loaded from " + configFilePath + " for database: " + cfg.database);
 }
 
 bool Database::connect() {
-    std::lock_guard<std::mutex> lock(m_dbMutex);
+    std::lock_guard<std::recursive_mutex> lock(m_dbMutex);
     if (m_connected) return true;
 
 #if defined(USE_MYSQL_CLIENT)
@@ -171,7 +177,7 @@ bool Database::connect() {
 }
 
 void Database::disconnect() {
-    std::lock_guard<std::mutex> lock(m_dbMutex);
+    std::lock_guard<std::recursive_mutex> lock(m_dbMutex);
 #if defined(USE_MYSQL_CLIENT)
     if (m_mysqlHandle) {
         mysql_close(static_cast<MYSQL*>(m_mysqlHandle));
@@ -184,6 +190,7 @@ void Database::disconnect() {
 bool Database::isConnected() const { return m_connected; }
 
 std::string Database::escapeString(const std::string& str) {
+    std::lock_guard<std::recursive_mutex> lock(m_dbMutex);
 #if defined(USE_MYSQL_CLIENT)
     if (m_connected && m_mysqlHandle) {
         std::vector<char> buffer(str.length() * 2 + 1);
@@ -207,7 +214,7 @@ std::string Database::escapeString(const std::string& str) {
 }
 
 QueryResult Database::executeQuery(const std::string& sql) {
-    std::lock_guard<std::mutex> lock(m_dbMutex);
+    std::lock_guard<std::recursive_mutex> lock(m_dbMutex);
     if (!m_connected) {
         connect();
     }
@@ -243,7 +250,7 @@ QueryResult Database::executeQuery(const std::string& sql) {
 }
 
 int Database::executeUpdate(const std::string& sql) {
-    std::lock_guard<std::mutex> lock(m_dbMutex);
+    std::lock_guard<std::recursive_mutex> lock(m_dbMutex);
     if (!m_connected) {
         connect();
     }
@@ -261,7 +268,7 @@ int Database::executeUpdate(const std::string& sql) {
 }
 
 long long Database::getLastInsertId() {
-    std::lock_guard<std::mutex> lock(m_dbMutex);
+    std::lock_guard<std::recursive_mutex> lock(m_dbMutex);
 #if defined(USE_MYSQL_CLIENT)
     if (m_mysqlHandle) {
         return static_cast<long long>(mysql_insert_id(static_cast<MYSQL*>(m_mysqlHandle)));

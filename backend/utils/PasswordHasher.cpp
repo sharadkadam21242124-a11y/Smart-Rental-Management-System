@@ -106,10 +106,63 @@ std::string PasswordHasher::generateSalt(size_t byteCount) {
     return ss.str();
 }
 
+std::string PasswordHasher::pbkdf2(const std::string& password, const std::string& salt, uint32_t iterations) {
+    std::vector<uint8_t> key(32);
+#if defined(_WIN32)
+    BCRYPT_ALG_HANDLE hAlg = NULL;
+    NTSTATUS status = BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, NULL, BCRYPT_ALG_HANDLE_HMAC_FLAG);
+    if (BCRYPT_SUCCESS(status)) {
+        status = BCryptDeriveKeyPBKDF2(hAlg,
+                                       reinterpret_cast<PUCHAR>(const_cast<char*>(password.data())),
+                                       static_cast<ULONG>(password.length()),
+                                       reinterpret_cast<PUCHAR>(const_cast<char*>(salt.data())),
+                                       static_cast<ULONG>(salt.length()),
+                                       iterations,
+                                       key.data(),
+                                       static_cast<ULONG>(key.size()),
+                                       0);
+        BCryptCloseAlgorithmProvider(hAlg, 0);
+        if (BCRYPT_SUCCESS(status)) {
+            std::ostringstream ss;
+            for (uint8_t b : key) {
+                ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(b);
+            }
+            return ss.str();
+        }
+    }
+#endif
+    // Fallback software key stretching if CNG is unavailable
+    std::string digest = sha256(salt + ":" + password);
+    for (uint32_t i = 1; i < iterations; ++i) {
+        digest = sha256(digest + ":" + password);
+    }
+    return digest;
+}
+
 std::string PasswordHasher::hashPassword(const std::string& plainPassword) {
     std::string salt = generateSalt(16);
-    std::string digest = sha256(salt + ":" + plainPassword);
-    return "SALTED$" + salt + "$" + digest;
+    std::string derivedKey = pbkdf2(plainPassword, salt, PBKDF2_RECOMMENDED_ITERATIONS);
+    return "PBKDF2$" + std::to_string(PBKDF2_RECOMMENDED_ITERATIONS) + "$" + salt + "$" + derivedKey;
+}
+
+bool PasswordHasher::isLegacyHash(const std::string& storedHash) {
+    if (storedHash.rfind("PBKDF2$", 0) != 0) {
+        return true; // Legacy SHA-256 or transitional format
+    }
+    // Enable future work-factor upgrade if stored iterations are less than current recommendation
+    size_t firstDollar = storedHash.find('$');
+    size_t secondDollar = storedHash.find('$', firstDollar + 1);
+    if (secondDollar != std::string::npos) {
+        try {
+            uint32_t iters = static_cast<uint32_t>(std::stoul(storedHash.substr(firstDollar + 1, secondDollar - (firstDollar + 1))));
+            if (iters < PBKDF2_RECOMMENDED_ITERATIONS) {
+                return true; // Eligible for automatic work factor upgrade
+            }
+        } catch (...) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool PasswordHasher::constantTimeCompare(const std::string& a, const std::string& b) {
@@ -122,7 +175,21 @@ bool PasswordHasher::constantTimeCompare(const std::string& a, const std::string
 }
 
 bool PasswordHasher::verifyPassword(const std::string& plainPassword, const std::string& storedHash) {
-    // 1. Salted Hash Format: SALTED$<salt>$<hash>
+    // 1. NIST SP 800-132 PBKDF2-HMAC-SHA256 Format: PBKDF2$<iterations>$<salt>$<hash>
+    if (storedHash.rfind("PBKDF2$", 0) == 0) {
+        size_t firstDollar = storedHash.find('$');
+        size_t secondDollar = storedHash.find('$', firstDollar + 1);
+        size_t thirdDollar = (secondDollar != std::string::npos) ? storedHash.find('$', secondDollar + 1) : std::string::npos;
+        if (secondDollar != std::string::npos && thirdDollar != std::string::npos) {
+            uint32_t iters = static_cast<uint32_t>(std::stoul(storedHash.substr(firstDollar + 1, secondDollar - (firstDollar + 1))));
+            std::string salt = storedHash.substr(secondDollar + 1, thirdDollar - (secondDollar + 1));
+            std::string expectedDigest = storedHash.substr(thirdDollar + 1);
+            std::string actualDigest = pbkdf2(plainPassword, salt, iters);
+            return constantTimeCompare(actualDigest, expectedDigest);
+        }
+    }
+
+    // 2. Salted Single-Round Hash Format (transitional): SALTED$<salt>$<hash>
     if (storedHash.rfind("SALTED$", 0) == 0) {
         size_t firstDollar = storedHash.find('$');
         size_t secondDollar = storedHash.find('$', firstDollar + 1);
@@ -134,7 +201,7 @@ bool PasswordHasher::verifyPassword(const std::string& plainPassword, const std:
         }
     }
 
-    // 2. Standard SHA-256 Verification (legacy compatibility for existing databases)
+    // 3. Standard SHA-256 Verification (legacy compatibility for initial seeds)
     std::string inputHash = sha256(plainPassword);
     if (constantTimeCompare(inputHash, storedHash)) {
         return true;

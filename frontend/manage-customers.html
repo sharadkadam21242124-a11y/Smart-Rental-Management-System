@@ -116,11 +116,11 @@
       tbody.innerHTML = items.map(c => `
         <tr>
           <td><span class="font-monospace text-muted">#${c.customer_id}</span></td>
-          <td><strong class="text-dark">${c.full_name}</strong></td>
-          <td><a href="mailto:${c.email}" class="text-decoration-none">${c.email}</a></td>
-          <td>${c.phone}</td>
-          <td class="small text-muted" style="max-width: 220px;">${c.address}</td>
-          <td class="small font-monospace">${c.id_proof_number || '-'}</td>
+          <td><strong class="text-dark">${escapeHtml(c.full_name)}</strong></td>
+          <td><a href="mailto:${encodeURIComponent(c.email)}" class="text-decoration-none">${escapeHtml(c.email)}</a></td>
+          <td>${escapeHtml(c.phone)}</td>
+          <td class="small text-muted" style="max-width: 220px;">${escapeHtml(c.address)}</td>
+          <td class="small font-monospace">${escapeHtml(c.id_proof_number || '-')}</td>
           <td>
             <span class="badge ${c.is_active ? 'bg-success' : 'bg-danger'}">${c.is_active ? 'Active' : 'Suspended'}</span>
           </td>

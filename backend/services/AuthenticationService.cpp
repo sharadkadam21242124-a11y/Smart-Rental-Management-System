@@ -68,6 +68,20 @@ std::pair<std::string, SessionInfo> AuthenticationService::login(const std::stri
         throw AuthenticationException("Invalid email or password.");
     }
 
+    // Transparent on-login migration from legacy/salted-SHA256 to PBKDF2-HMAC-SHA256
+    if (PasswordHasher::isLegacyHash(user->getPasswordHash())) {
+        try {
+            std::string modernHash = PasswordHasher::hashPassword(password);
+            m_userRepo.updatePassword(user->getId(), modernHash);
+            Logger::info("Migrated user #" + std::to_string(user->getId()) + " password hash to PBKDF2-HMAC-SHA256.");
+        } catch (const std::exception& migEx) {
+            Logger::warn("Password hash migration notice: " + std::string(migEx.what()));
+        }
+    }
+
+    // Lazily purge expired sessions on active login
+    purgeExpiredSessions();
+
     std::string token = generateSessionToken();
 
     auto now = std::chrono::duration_cast<std::chrono::seconds>(

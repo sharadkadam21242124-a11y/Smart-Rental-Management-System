@@ -30,6 +30,10 @@ bool BookingRepository::isItemAvailableForDates(int itemId, const std::string& s
 std::shared_ptr<Booking> BookingRepository::createBooking(int customerId, int itemId,
                                                         const std::string& startDate,
                                                         const std::string& endDate) {
+    // Thread synchronization mutex ensuring ACID transaction atomicity on shared MySQL connection
+    static std::mutex s_bookingLockMutex;
+    std::lock_guard<std::mutex> lock(s_bookingLockMutex);
+
     if (startDate >= endDate) {
         throw ValidationException("Booking start date must be strictly before end date.");
     }

@@ -113,12 +113,27 @@ int main(int argc, char* argv[]) {
         }
         Logger::info("Mounted static frontend web assets from: " + frontendDir);
 
-        // Wildcard CORS pre-flight handler
-        g_server->Options(R"(.*)", [](const httplib::Request&, httplib::Response& res) {
+        // Trusted Origin CORS pre-flight handler
+        g_server->Options(R"(.*)", [](const httplib::Request& req, httplib::Response& res) {
+            std::string origin = req.get_header_value("Origin");
+            if (!origin.empty() && !ApiControllerBase::isTrustedOrigin(origin)) {
+                res.status = 403;
+                res.set_content("{\"error\":\"CORS origin denied\"}", "application/json");
+                return;
+            }
+            ApiControllerBase::setCorsHeaders(res, origin);
             res.status = 204;
-            res.set_header("Access-Control-Allow-Origin", "*");
-            res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-            res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        });
+
+        // Set CORS headers for all responses if origin is trusted; omit entirely for untrusted origins
+        g_server->set_post_routing_handler([](const httplib::Request& req, httplib::Response& res) {
+            std::string origin = req.get_header_value("Origin");
+            if (!origin.empty() && ApiControllerBase::isTrustedOrigin(origin)) {
+                res.set_header("Access-Control-Allow-Origin", origin);
+                res.set_header("Vary", "Origin");
+                res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            }
         });
 
         // Root redirect to index.html

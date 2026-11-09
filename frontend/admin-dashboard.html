@@ -275,10 +275,10 @@
 
         tbody.innerHTML = bookings.map(b => `
           <tr>
-            <td><strong class="font-monospace text-primary">${b.booking_code}</strong></td>
-            <td>${b.customer_name || 'Customer #' + b.customer_id}</td>
-            <td><strong class="text-dark">${b.item_title}</strong></td>
-            <td><span class="badge badge-category position-static badge-${b.category || 'Car'} py-0 px-2">${b.category}</span></td>
+            <td><strong class="font-monospace text-primary">${escapeHtml(b.booking_code)}</strong></td>
+            <td>${escapeHtml(b.customer_name || 'Customer #' + b.customer_id)}</td>
+            <td><strong class="text-dark">${escapeHtml(b.item_title)}</strong></td>
+            <td><span class="badge badge-category position-static badge-${escapeHtml(b.category || 'Car')} py-0 px-2">${escapeHtml(b.category)}</span></td>
             <td class="small text-muted">${formatDate(b.start_date)} to ${formatDate(b.end_date)}</td>
             <td><strong>${formatCurrency(b.total_amount)}</strong></td>
             <td><span class="badge ${getStatusBadge(b.booking_status)} text-capitalize">${b.booking_status}</span></td>

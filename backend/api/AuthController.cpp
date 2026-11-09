@@ -6,14 +6,6 @@ AuthController::AuthController(AuthenticationService& auth, UserRepository& user
     : m_authService(auth), m_userRepo(userRepo) {}
 
 void AuthController::registerRoutes(httplib::Server& svr) {
-    // OPTIONS Pre-flight handler
-    svr.Options("/api/.*", [](const httplib::Request&, httplib::Response& res) {
-        res.status = 200;
-        res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    });
-
     // POST /api/register and /api/auth/register
     auto registerHandler = [this](const httplib::Request& req, httplib::Response& res) {
         try {

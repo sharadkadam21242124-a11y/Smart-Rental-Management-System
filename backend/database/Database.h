@@ -25,7 +25,7 @@ struct DatabaseConfig {
     int port = 3306;
     std::string database = "smart_rental_db";
     std::string username = "rental_user";
-    std::string password = "RentalUser@2026";
+    std::string password = ""; // Populated securely from config/database.json or DB_PASSWORD env
     int poolSize = 5;
     int timeoutSeconds = 10;
 };
@@ -71,7 +71,7 @@ private:
 
     DatabaseConfig m_config;
     bool m_connected;
-    std::mutex m_dbMutex;
+    std::recursive_mutex m_dbMutex;
 
 #if defined(USE_MYSQL_CLIENT)
     MYSQL* m_mysqlHandle;
@@ -109,22 +109,29 @@ public:
 
     // Health check
     bool testConnection();
+
+    // Access to database mutex for multi-statement atomic transactions
+    std::recursive_mutex& getDbMutex() { return m_dbMutex; }
 };
 
 /**
  * ============================================================================
  * OOP CONCEPT: RAII (Resource Acquisition Is Initialization)
  * TransactionGuard guarantees automatic ROLLBACK if a transaction fails
- * before an explicit commit() is invoked.
+ * before an explicit commit() is invoked. It holds an exclusive lock on the
+ * database connection across the entire transaction to prevent race conditions
+ * or interleaving queries from concurrent threads.
  * ============================================================================
  */
 class TransactionGuard {
 private:
     Database& m_db;
+    std::unique_lock<std::recursive_mutex> m_lock;
     bool m_committed;
 
 public:
-    explicit TransactionGuard(Database& db) : m_db(db), m_committed(false) {
+    explicit TransactionGuard(Database& db)
+        : m_db(db), m_lock(db.getDbMutex()), m_committed(false) {
         m_db.beginTransaction();
     }
 
